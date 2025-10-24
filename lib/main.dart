@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:todo_app/config/router/app_router.dart';
 import 'package:todo_app/config/theme/app_theme.dart';
-import 'package:todo_app/features/screens/screens.dart';
 
 void main() {
   runApp(const MyApp());
@@ -11,11 +11,12 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return MaterialApp.router(
       debugShowCheckedModeBanner: false,
       title: 'To-Do App',
       theme: AppTheme(isDarkMode: true, selectedColor: 0).getTheme(),
-      home: HomePage(),
+      routerConfig: appRouter,
+      // home: HomePage(),
     );
   }
 }
