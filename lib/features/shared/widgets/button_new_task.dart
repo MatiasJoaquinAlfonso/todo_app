@@ -1,7 +1,13 @@
 import 'package:flutter/material.dart';
 
 class ButtonNewTask extends StatelessWidget {
-  const ButtonNewTask({super.key});
+
+  final VoidCallback onTap;
+
+  const ButtonNewTask({
+    super.key, 
+    required this.onTap
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -9,11 +15,9 @@ class ButtonNewTask extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 8),
       child: Card(
         clipBehavior: Clip.antiAliasWithSaveLayer,
-        elevation: 2,
+        elevation: 4,
         child: InkWell(
-          onTap: () {
-            //TODO: Ir a pantalla '/task-screen'.
-          },
+          onTap: onTap,
           child: ListTile(
             title: Text(
               'Agregar nueva tarea.',
@@ -38,7 +42,6 @@ class ButtonNewTask extends StatelessWidget {
       //   clipBehavior: Clip.antiAlias,
       //   child: InkWell(
       //     onTap: () {
-      //       //TODO: Ir a pantalla '/task-screen'.
       //     },
       //     child: Center(
       //       child: Row(

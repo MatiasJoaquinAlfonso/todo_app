@@ -7,6 +7,7 @@ class TaskCard extends StatelessWidget {
   final String subTitle;
   final String longDescription;
   final double borderRadius;
+  final VoidCallback onTap;
 
   const TaskCard({
     super.key, 
@@ -14,6 +15,7 @@ class TaskCard extends StatelessWidget {
     this.subTitle = '', 
     required this.longDescription,
     required this.borderRadius, 
+    required this.onTap, 
   });
 
   @override
@@ -31,16 +33,12 @@ class TaskCard extends StatelessWidget {
 
             title: GestureDetector(
               behavior: HitTestBehavior.opaque,
-              onTap: () {
-                //TODO: Ir a la ruta '/task-screen'.
-              },
+              onTap: onTap,
               child: Text(title,)
             ),
             subtitle: GestureDetector(
               behavior: HitTestBehavior.opaque,
-              onTap: () {
-                //TODO: Ir a la ruta '/task-screen'.
-              },
+              onTap: onTap,
               child: Text(
                 subTitle, 
                 // style: style,
