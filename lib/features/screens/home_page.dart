@@ -1,8 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+// import 'package:todo_app/features/screens/screens.dart';
 import 'package:todo_app/features/shared/widgets/widgets.dart';
 
 class HomePage extends StatelessWidget {
+
+  // final viewRoutes = const <Widget>[
+  //   HomePage(),
+  //   TaskFinishScreen(),
+  //   ConfigScreen(),
+  // ];
 
   const HomePage({super.key});
 
