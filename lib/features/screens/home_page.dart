@@ -11,26 +11,25 @@ class HomePage extends StatelessWidget {
     
     final listTask = [
 
-      // (
-      //   title: 'Tarea 1',
-      //   subTitle: 'Incididunt do adipisicing labore mollit laborum sunt eiusmod ad sit pariatur fugiat pariatur adipisicing ex.',
-      //   description: 'Duis mollit deserunt velit adipisicing. Veniam sint veniam mollit do non eu do aute ut amet esse. Proident et do sint nulla irure dolor excepteur laborum deserunt anim eiusmod aliqua tempor. Ea aliqua laborum duis ad aliquip voluptate quis. Et sint Lorem officia irure deserunt labore esse occaecat ut nulla irure fugiat. Culpa sint excepteur sit commodo ea do pariatur. Nostrud et magna ipsum voluptate consequat ullamco eu culpa excepteur culpa elit.',
-      // ),
+      (
+        title: 'Tarea 1',
+        subTitle: 'Incididunt do adipisicing labore mollit laborum sunt eiusmod ad sit pariatur fugiat pariatur adipisicing ex.',
+        description: 'Duis mollit deserunt velit adipisicing. Veniam sint veniam mollit do non eu do aute ut amet esse. Proident et do sint nulla irure dolor excepteur laborum deserunt anim eiusmod aliqua tempor. Ea aliqua laborum duis ad aliquip voluptate quis. Et sint Lorem officia irure deserunt labore esse occaecat ut nulla irure fugiat. Culpa sint excepteur sit commodo ea do pariatur. Nostrud et magna ipsum voluptate consequat ullamco eu culpa excepteur culpa elit.',
+      ),
 
-      // (
-      //   title: 'Tarea 2',
-      //   subTitle: 'Incididunt do adipisicing labore mollit laborum sunt eiusmod ad sit pariatur fugiat pariatur adipisicing ex.',
-      //   description: 'Duis mollit deserunt velit adipisicing. Veniam sint veniam mollit do non eu do aute ut amet esse. Proident et do sint nulla irure dolor excepteur laborum deserunt anim eiusmod aliqua tempor. ',
-      // ),
+      (
+        title: 'Tarea 2',
+        subTitle: 'Incididunt do adipisicing labore mollit laborum sunt eiusmod ad sit pariatur fugiat pariatur adipisicing ex.',
+        description: 'Duis mollit deserunt velit adipisicing. Veniam sint veniam mollit do non eu do aute ut amet esse. Proident et do sint nulla irure dolor excepteur laborum deserunt anim eiusmod aliqua tempor. ',
+      ),
 
-      // (
-      //   title: 'Tarea 3',
-      //   subTitle: 'Incididunt do adipisicing labore mollit laborum sunt eiusmod ad sit pariatur fugiat pariatur adipisicing ex.',
-      //   description: 'Duis mollit deserunt velit adipisicing. Veniam sint veniam mollit do non eu do aute ut amet esse. Proident et do sint nulla irure dolor excepteur laborum deserunt anim eiusmod aliqua tempor. Ea aliqua laborum duis ad aliquip voluptate quis. Et sint Lorem officia irure deserunt labore esse occaecat ut nulla irure fugiat. Culpa sint excepteur sit commodo ea do pariatur. Nostrud et magna ipsum voluptate consequat ullamco eu culpa excepteur culpa elit.',
-      // ),
+      (
+        title: 'Tarea 3',
+        subTitle: 'Incididunt do adipisicing labore mollit laborum sunt eiusmod ad sit pariatur fugiat pariatur adipisicing ex.',
+        description: 'Duis mollit deserunt velit adipisicing. Veniam sint veniam mollit do non eu do aute ut amet esse. Proident et do sint nulla irure dolor excepteur laborum deserunt anim eiusmod aliqua tempor. Ea aliqua laborum duis ad aliquip voluptate quis. Et sint Lorem officia irure deserunt labore esse occaecat ut nulla irure fugiat. Culpa sint excepteur sit commodo ea do pariatur. Nostrud et magna ipsum voluptate consequat ullamco eu culpa excepteur culpa elit.',
+      ),
 
     ];
-
 
 
     return Scaffold(
@@ -54,6 +53,7 @@ class HomePage extends StatelessWidget {
             children: [
               // const SizedBox(height: 30),
               ButtonNewTask(
+                paddingH: 8,
                 onTap: () => context.push('/task-screen'),
               ),
               const SizedBox(height: 30,),
@@ -78,6 +78,7 @@ class HomePage extends StatelessWidget {
 
           if (index == listTask.length) {
             return ButtonNewTask(
+              paddingH: 0,
               onTap: () => context.push('/task-screen'),
             );
           }
