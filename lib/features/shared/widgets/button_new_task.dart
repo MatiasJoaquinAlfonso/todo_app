@@ -54,12 +54,12 @@ class ButtonNewTask extends StatelessWidget {
             onTap: onTap,
             child: ListTile(
               title: Text(
-                'Agregar nueva tarea.',
+                'Agregar nueva tarea',
                 textAlign: TextAlign.center,
               ),
               leading: Icon(
                 Icons.add_rounded,
-                textDirection: TextDirection.rtl,
+                // textDirection: TextDirection.,
               ),
             ),
           ),
