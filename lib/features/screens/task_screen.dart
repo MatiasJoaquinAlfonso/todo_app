@@ -18,10 +18,12 @@ class TaskScreen extends StatelessWidget {
         title: Text(
           'Tarea',
           style: TextStyle(
-
+            fontWeight: FontWeight.w900,
           ),
 
         ),
+      ),
+      body: Container(
       ),
     );
   }

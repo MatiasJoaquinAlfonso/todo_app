@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class ConfigScreen extends StatelessWidget {
-  const ConfigScreen({super.key});
+class SettingsScreen extends StatelessWidget {
+  const SettingsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {

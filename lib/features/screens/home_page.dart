@@ -102,6 +102,48 @@ class HomePage extends StatelessWidget {
 
       ),
 
+
+      // bottomNavigationBar: Container(
+      //   decoration: BoxDecoration(
+      //     color: Theme.of(context).colorScheme.surfaceBright,
+      //     borderRadius: const BorderRadius.only(
+      //       topLeft: Radius.circular(16),
+      //       topRight: Radius.circular(16),
+      //     )
+      //   ),
+
+      //   child: BottomNavigationBar(
+      //     // currentIndex: _currentIndex,
+          
+      //     items: [
+      //       BottomNavigationBarItem(
+      //         icon: Icon(Icons.check_rounded),
+      //         activeIcon: Icon(
+      //           Icons.check_rounded, 
+      //           color: Colors.blueAccent,
+      //         ),
+      //         label: 'Tasks'
+      //       ),
+
+      //       BottomNavigationBarItem(
+      //         icon: Icon(Icons.check_circle_outline_outlined),
+      //         activeIcon: Icon(
+      //           Icons.check_circle_outline_outlined, 
+      //           color: Colors.blueAccent,
+      //         ),
+      //       ),
+
+      //       BottomNavigationBarItem(
+      //         icon: Icon(Icons.settings_rounded),
+      //         activeIcon: Icon(
+      //           Icons.settings_rounded,
+      //           color: Colors.blueAccent,
+      //         ),
+      //       ),
+      //     ] 
+      //   ),
+      // ),
+
     );
   }
 }
