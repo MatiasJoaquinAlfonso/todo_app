@@ -21,10 +21,18 @@ final appRouter = GoRouter(
               path: '/',
               builder: (context, state) => HomePage(),
               routes: [
+                //! Tareas de pendientes.
+                GoRoute(
+                  path: '/task-screen/:id',
+                  builder: (context, state) => TaskScreen(),
+                ),
+
+                //! Nuevas tareas.
                 GoRoute(
                   path: '/task-screen',
                   builder: (context, state) => TaskScreen(),
                 ),
+
               ]
 
             ),
