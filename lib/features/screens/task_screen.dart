@@ -100,41 +100,25 @@ class _TaskScreenState extends State<TaskScreen> {
 
       body: Padding(
         padding: EdgeInsetsGeometry.all(16),
-        child: Expanded(
-          child: TextFormField(
-            controller: _descriptionController,
-            decoration: const InputDecoration(
-              hintText: 'Descripción',
-              border: InputBorder.none,
+        child: Column(
+          children: [
+            Expanded(
+              child: TextFormField(
+                controller: _descriptionController,
+                decoration: const InputDecoration(
+                  hintText: 'Descripción',
+                  border: InputBorder.none,
+                ),
+                maxLines: null,
+                keyboardType: TextInputType.multiline,
+            
+                expands: true,
+                textAlignVertical: TextAlignVertical.top,
+              ),
             ),
-            maxLines: null,
-            keyboardType: TextInputType.multiline,
-        
-            expands: true,
-            textAlignVertical: TextAlignVertical.top,
-          ),
+          ]
         ),
       ),
-
-      // body: Padding(
-      //   padding: EdgeInsets.all(16),
-      //   child: Column(
-      //     children: [
-      //       TextFormField(
-      //         controller: _descriptionController,
-      //         decoration: InputDecoration(
-      //           labelText: 'Descripción',
-      //           border: OutlineInputBorder(), 
-      //           alignLabelWithHint: true,
-      //         ),
-      //         maxLines: null,
-      //         keyboardType: TextInputType.multiline,
-      //         expands: true,
-      //         textAlignVertical: TextAlignVertical.top,
-      //       ),
-      //     ],
-      //   ), 
-      // ),
 
     );
   }

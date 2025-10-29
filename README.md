@@ -1,16 +1,16 @@
 # todo_app
 
-A new Flutter project.
+Este proyecto forma parte de mi portfolio, para demostrar mis conocimientos.
+Y a su vez poder desarrollar algo que sea utilizable, comodo al usuario y visualmente bonito.
 
-## Getting Started
+El proposito de esta app es hacer una lista TO-DO "Que haceres", donde sirva como organizador
+para el usuario con alertas para recordatorios establecidos, almacenando estas "Tareas" 
+en el dispositivo, con historial de tareas completadas. 
 
-This project is a starting point for a Flutter application.
 
-A few resources to get you started if this is your first Flutter project:
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+La idea es implementarlo con:
+- Una DB local en el dispositivo.
+- Conectarlo con Google calendar/Calendario del dispositivo.
+- Notificaciones push.
+ 
