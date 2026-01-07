@@ -15,7 +15,7 @@ class TaskCard extends StatelessWidget {
     this.subTitle = '', 
     required this.longDescription,
     required this.borderRadius, 
-    required this.onTap, 
+  required this.onTap, 
   });
 
   @override
