@@ -5,11 +5,11 @@ import 'package:todo_app/features/todo/data/mappers/event_mapper.dart';
 // import 'package:drift/drift.dart';
 
 
-class EventsRespositoryImpl extends EventRepository {
+class EventRepositoryImpl extends EventRepository {
 
   final AppDatabase db;
 
-  EventsRespositoryImpl({required this.db});
+  EventRepositoryImpl({required this.db});
 
   @override
   Stream<List<EventEntity>> getEvents() {

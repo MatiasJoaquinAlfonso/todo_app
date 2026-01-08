@@ -1,44 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 // import 'package:todo_app/features/screens/screens.dart';
 import 'package:todo_app/features/shared/widgets/widgets.dart';
+import 'package:todo_app/features/todo/domain/entities/event_entity.dart';
+import 'package:todo_app/features/todo/presentation/bloc/bloc/todo_bloc.dart';
 
 class HomePage extends StatelessWidget {
-
-  // final viewRoutes = const <Widget>[
-  //   HomePage(),
-  //   TaskFinishScreen(),
-  //   ConfigScreen(),
-  // ];
-
   const HomePage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    
-    final listTask = [
-
-      (
-        title: 'Tarea 1',
-        subTitle: 'Incididunt do adipisicing labore mollit laborum sunt eiusmod ad sit pariatur fugiat pariatur adipisicing ex.',
-        description: 'Duis mollit deserunt velit adipisicing. Veniam sint veniam mollit do non eu do aute ut amet esse. Proident et do sint nulla irure dolor excepteur laborum deserunt anim eiusmod aliqua tempor. Ea aliqua laborum duis ad aliquip voluptate quis. Et sint Lorem officia irure deserunt labore esse occaecat ut nulla irure fugiat. Culpa sint excepteur sit commodo ea do pariatur. Nostrud et magna ipsum voluptate consequat ullamco eu culpa excepteur culpa elit.',
-      ),
-
-      (
-        title: 'Tarea 2',
-        subTitle: 'Incididunt do adipisicing labore mollit laborum sunt eiusmod ad sit pariatur fugiat pariatur adipisicing ex.',
-        description: 'Duis mollit deserunt velit adipisicing. Veniam sint veniam mollit do non eu do aute ut amet esse. Proident et do sint nulla irure dolor excepteur laborum deserunt anim eiusmod aliqua tempor. ',
-      ),
-
-      (
-        title: 'Tarea 3',
-        subTitle: 'Incididunt do adipisicing labore mollit laborum sunt eiusmod ad sit pariatur fugiat pariatur adipisicing ex.',
-        description: 'Duis mollit deserunt velit adipisicing. Veniam sint veniam mollit do non eu do aute ut amet esse. Proident et do sint nulla irure dolor excepteur laborum deserunt anim eiusmod aliqua tempor. Ea aliqua laborum duis ad aliquip voluptate quis. Et sint Lorem officia irure deserunt labore esse occaecat ut nulla irure fugiat. Culpa sint excepteur sit commodo ea do pariatur. Nostrud et magna ipsum voluptate consequat ullamco eu culpa excepteur culpa elit.',
-      ),
-
-    ];
-
-
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -52,97 +24,127 @@ class HomePage extends StatelessWidget {
           )
         ],
       ),
-      // Despues agregar la propiedad .Builder para hacer una lista infinita
-      body: listTask.isEmpty 
-        ? Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              // const SizedBox(height: 30),
-              ButtonNewTask(
-                paddingH: 8,
-                onTap: () => context.push('/task-screen'),
-              ),
-              const SizedBox(height: 30,),
-              const Icon(
-                Icons.check_rounded,
-                size: 60,
-                // color: ,
-              ),
-              const SizedBox(height: 16,),
-              const Text(
-                'No hay tareas para mostrar.',
-                style: TextStyle(fontSize: 18, ),
-              ),
+      
+      body: BlocBuilder<TodoBloc, TodoState>(
+        builder: (context, state) {
 
-            ],
-          ),
-        )
-        : ListView.builder(
-        padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-        itemCount: listTask.length + 1,
-        itemBuilder: (context, index) {
-
-          if (index == listTask.length) {
-            return ButtonNewTask(
-              paddingH: 0,
-              onTap: () => context.push('/task-screen'),
-            );
+          if (state is TodoLoading) {
+            return const Center(child: CircularProgressIndicator());
           }
 
-          final task = listTask[index];
-          return TaskCard(
-            title: task.title, 
-            subTitle: task.subTitle,
-            longDescription: task.description, 
-            borderRadius: 15,
-            onTap: () => context.push('/task-screen'),
-          );
-        },
+          if (state is TodoError) {
+            return Center(child: Text('Error: ${state.errorMessage}'));
+          }
 
+          if (state is TodoLoaded) {
+            if (state.events.isEmpty){
+              return Column(
+                // mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 20.0),
+                    child: ButtonNewTask(
+                      paddingH: 8,
+                      onTap: () => context.push('/task-screen', extra: null),
+                    ),
+                  ),
+
+                  Icon(Icons.check_rounded, size: 80, color: Colors.white),
+                  const SizedBox(height: 16),
+                  Text(
+                    'No hay tareas para mostrar.',
+                    style: TextStyle(
+                      fontSize: 18,
+                      color: Colors.white
+                    ),
+                  ),
+                  
+                ],
+              );
+            }
+
+            return ListView.builder(
+              padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+              itemCount: state.events.length + 1,
+              itemBuilder: (context, index) {
+            
+                 if (index == state.events.length) {
+                   return Padding(
+                     padding: const EdgeInsets.only(top: 8.0, bottom: 20.0),
+                     child: ButtonNewTask(
+                       paddingH: 0,
+                       onTap: () => context.push('/task-screen', extra: null),
+                     ),
+                   );
+                }
+            
+                final task = state.events[index];
+                return Dismissible(
+                  key: Key(task.id.toString()),
+                  direction: DismissDirection.endToStart,
+                  
+                  onDismissed: (direction) {
+                    context.read<TodoBloc>().add(TodoDeleted(task));
+                  },
+            
+                  background: Container(
+                    margin: const EdgeInsets.symmetric(vertical: 4),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(15),
+                      gradient: LinearGradient(
+                        begin: Alignment.centerLeft,
+                        end: Alignment.centerRight,
+                        colors: [
+                          const Color.fromARGB(0, 244, 67, 54),
+                          Colors.redAccent.shade700,
+                        ],
+                        stops: const [0.4, 1.0],
+            
+                      ),
+                    ),
+                    alignment: Alignment.centerRight,
+                    padding: const EdgeInsets.only(right: 25.0),
+                    child: const Icon(
+                      Icons.delete_outline_rounded,
+                      color: Colors.white,
+                      size: 30,
+                    ),
+                  ),
+            
+                  child: TaskCard(
+                    title: task.title, 
+                    subTitle: task.subTitle ?? '',
+                    longDescription: task.description ?? '', 
+                    borderRadius: 15,
+                    onTap: () => context.push('/task-screen', extra: task),
+                  ),
+                );
+              },
+            
+            );
+
+
+          }
+
+          return Container(child: Text('Iniciando...'),);
+        },
       ),
 
-
-      // bottomNavigationBar: Container(
-      //   decoration: BoxDecoration(
-      //     color: Theme.of(context).colorScheme.surfaceBright,
-      //     borderRadius: const BorderRadius.only(
-      //       topLeft: Radius.circular(16),
-      //       topRight: Radius.circular(16),
-      //     )
-      //   ),
-
-      //   child: BottomNavigationBar(
-      //     // currentIndex: _currentIndex,
+      floatingActionButton: FloatingActionButton(
+        child: const Icon(Icons.add),
+        onPressed: () {
+          // Creamos una tarea dummy
+          final newTask = EventEntity(
+            title: 'Tarea de Prueba ${DateTime.now().second}',
+            description: 'Creada automáticamente',
+            dateInit: DateTime.now(),
+            isAllDay: false,
+          );
           
-      //     items: [
-      //       BottomNavigationBarItem(
-      //         icon: Icon(Icons.check_rounded),
-      //         activeIcon: Icon(
-      //           Icons.check_rounded, 
-      //           color: Colors.blueAccent,
-      //         ),
-      //         label: 'Tasks'
-      //       ),
-
-      //       BottomNavigationBarItem(
-      //         icon: Icon(Icons.check_circle_outline_outlined),
-      //         activeIcon: Icon(
-      //           Icons.check_circle_outline_outlined, 
-      //           color: Colors.blueAccent,
-      //         ),
-      //       ),
-
-      //       BottomNavigationBarItem(
-      //         icon: Icon(Icons.settings_rounded),
-      //         activeIcon: Icon(
-      //           Icons.settings_rounded,
-      //           color: Colors.blueAccent,
-      //         ),
-      //       ),
-      //     ] 
-      //   ),
-      // ),
+          // Enviamos el evento al BLoC
+          context.read<TodoBloc>().add(TodoAdded(newTask));
+        },
+      ),
 
     );
   }
