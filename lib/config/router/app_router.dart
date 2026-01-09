@@ -1,6 +1,7 @@
 import 'package:go_router/go_router.dart';
 import 'package:todo_app/features/screens/screens.dart';
 import 'package:todo_app/features/shared/widgets/widgets.dart';
+import 'package:todo_app/features/todo/domain/entities/event_entity.dart';
 
 
 
@@ -48,17 +49,13 @@ final appRouter = GoRouter(
     ),
 
 
-    //! Nuevas tareas.
     GoRoute(
       path: '/task-screen',
-      builder: (context, state) => TaskScreen(),
+      builder: (context, state) { 
+        final taskToEdit = state.extra as EventEntity?;
+        return TaskScreen(event: taskToEdit);
+      },
     ),
-
-    //! Tareas de pendientes.
-    GoRoute(
-      path: '/task-screen/:id',
-      builder: (context, state) => TaskScreen(),
-      ),
 
   ]
 

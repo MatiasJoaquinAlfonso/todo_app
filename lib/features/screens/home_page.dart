@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-// import 'package:todo_app/features/screens/screens.dart';
 import 'package:todo_app/features/shared/widgets/widgets.dart';
-import 'package:todo_app/features/todo/domain/entities/event_entity.dart';
+// import 'package:todo_app/features/todo/domain/entities/event_entity.dart';
 import 'package:todo_app/features/todo/presentation/bloc/bloc/todo_bloc.dart';
 
 class HomePage extends StatelessWidget {
@@ -39,7 +38,6 @@ class HomePage extends StatelessWidget {
           if (state is TodoLoaded) {
             if (state.events.isEmpty){
               return Column(
-                // mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 20.0),
@@ -48,7 +46,7 @@ class HomePage extends StatelessWidget {
                       onTap: () => context.push('/task-screen', extra: null),
                     ),
                   ),
-
+              
                   Icon(Icons.check_rounded, size: 80, color: Colors.white),
                   const SizedBox(height: 16),
                   Text(
@@ -95,7 +93,7 @@ class HomePage extends StatelessWidget {
                         begin: Alignment.centerLeft,
                         end: Alignment.centerRight,
                         colors: [
-                          const Color.fromARGB(0, 244, 67, 54),
+                          const Color.fromARGB(37, 244, 67, 54),
                           Colors.redAccent.shade700,
                         ],
                         stops: const [0.4, 1.0],
@@ -126,25 +124,29 @@ class HomePage extends StatelessWidget {
 
           }
 
-          return Container(child: Text('Iniciando...'),);
+          return Column(children: [
+            
+            Text('Iniciando... '),
+            CircularProgressIndicator(),
+
+          ],);
+          // return Container(child: Text('Iniciando...'),);
         },
       ),
 
-      floatingActionButton: FloatingActionButton(
-        child: const Icon(Icons.add),
-        onPressed: () {
-          // Creamos una tarea dummy
-          final newTask = EventEntity(
-            title: 'Tarea de Prueba ${DateTime.now().second}',
-            description: 'Creada automáticamente',
-            dateInit: DateTime.now(),
-            isAllDay: false,
-          );
+      // floatingActionButton: FloatingActionButton(
+      //   child: const Icon(Icons.add),
+      //   onPressed: () {
+      //     final newTask = EventEntity(
+      //       title: 'Tarea de Prueba ${DateTime.now().second}',
+      //       description: 'Creada automáticamente',
+      //       dateInit: DateTime.now(),
+      //       isAllDay: false,
+      //     );
           
-          // Enviamos el evento al BLoC
-          context.read<TodoBloc>().add(TodoAdded(newTask));
-        },
-      ),
+      //     context.read<TodoBloc>().add(TodoAdded(newTask));
+      //   },
+      // ),
 
     );
   }
