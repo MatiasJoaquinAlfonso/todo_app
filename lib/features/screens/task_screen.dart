@@ -114,7 +114,7 @@ class _TaskScreenState extends State<TaskScreen> {
   }
 
   DateTime _joinDateTime(DateTime date, TimeOfDay time) {
-    return DateTime(date.year, date.month, date.day, time.hour, time.minute)
+    return DateTime(date.year, date.month, date.day, time.hour, time.minute);
   }
 
 

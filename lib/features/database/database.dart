@@ -12,7 +12,7 @@ class Events extends Table {
 
   // Fechas
   DateTimeColumn get dateInit => dateTime()();
-  DateTimeColumn get dateFinish => dateTime().nullable()();
+  DateTimeColumn get dateFinish => dateTime()();
   
   // Flags
   BoolColumn get isAllDay => boolean().withDefault(const Constant(false))();
