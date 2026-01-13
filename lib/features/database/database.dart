@@ -9,11 +9,15 @@ class Events extends Table {
   TextColumn get title => text().withLength(min: 1, max: 100)();
   TextColumn get subTitle => text().withLength(min: 1, max: 150).nullable()();
   TextColumn get description => text().nullable()();
+
+  // Fechas
   DateTimeColumn get dateInit => dateTime()();
   DateTimeColumn get dateFinish => dateTime().nullable()();
+  
+  // Flags
   BoolColumn get isAllDay => boolean().withDefault(const Constant(false))();
+  BoolColumn get isDone => boolean().withDefault(const Constant(false))();
   IntColumn get color => integer().nullable()();
-
 }
 
 @DriftDatabase(tables: [Events])

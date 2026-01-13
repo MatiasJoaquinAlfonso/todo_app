@@ -18,6 +18,10 @@ class _TaskScreenState extends State<TaskScreen> {
   final _descriptionController = TextEditingController();
   DateTime _dateInit = DateTime.now();
   DateTime _dateFinish = DateTime.now();
+  bool _isAllDay = false;
+  TimeOfDay _timeInit = TimeOfDay.now();
+  TimeOfDay _timeFinish = TimeOfDay.now();
+
   bool _shouldSave = true;
 
   bool get _isEditing => widget.event != null;
@@ -31,6 +35,9 @@ class _TaskScreenState extends State<TaskScreen> {
       _descriptionController.text = widget.event!.description ?? '';
       _dateInit = widget.event!.dateInit;
       _dateFinish = widget.event!.dateInit;
+      _isAllDay = widget.event!.isAllDay;
+      _timeInit = TimeOfDay.fromDateTime(widget.event!.dateInit);
+      _timeFinish = TimeOfDay.fromDateTime(widget.event!.dateFinish);
     }
   }
 
@@ -75,19 +82,63 @@ class _TaskScreenState extends State<TaskScreen> {
     }
   }
 
+  Future<void> _pickTime ({required bool isStart}) async {
+    final picked = await showTimePicker(
+      context: context, 
+      initialTime: isStart ? _timeInit : _timeFinish,
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: ColorScheme.dark(
+              primary: Colors.blue,
+              onPrimary: Colors.white,
+              surface: Colors.grey.shade900,
+              onSurface: Colors.white,
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+
+    if (picked != null){
+      setState(() {
+        if(isStart){
+          _timeInit = picked;
+        } else {
+          _timeFinish = picked;
+        }
+
+      });
+    }
+  }
+
+  DateTime _joinDateTime(DateTime date, TimeOfDay time) {
+    return DateTime(date.year, date.month, date.day, time.hour, time.minute)
+  }
+
+
   void _saveTask() {
     final title = _titleController.text.trim();
     final description = _descriptionController.text.trim();
+    DateTime finalDateInit;
+    DateTime finalDateFinish;
+
 
     if (!_shouldSave) return;
-
-    if (title.isEmpty && !_isEditing) {
-      return;
-    }
+    if (title.isEmpty && !_isEditing) return;
 
     if (title.isEmpty && _isEditing) {
       //TODO: Si borran el titulo y estan editando, validar si quiere no guardar o cancelar.
       return;
+    }
+
+    if (_isAllDay) {
+      finalDateInit = DateTime(_dateInit.year, _dateInit.month, _dateInit.day, 0, 0);
+      finalDateFinish = DateTime(_dateFinish.year, _dateFinish.month, _dateFinish.day, 23, 59);
+    } else {
+      finalDateInit = _joinDateTime(_dateInit, _timeInit);
+      finalDateFinish = _joinDateTime(_dateFinish, _timeFinish);
     }
 
     //TODO: Completar los campos hardcoded
@@ -95,8 +146,9 @@ class _TaskScreenState extends State<TaskScreen> {
       final updatedTask = widget.event!.copyWith(
         title: title,
         description: description,
-        dateInit: _dateInit,
-        dateFinish: _dateFinish,
+        dateInit: finalDateInit,
+        dateFinish: finalDateFinish,
+        isAllDay: _isAllDay,
       );
 
       context.read<TodoBloc>().add(TodoUpdated(updatedTask));
@@ -104,9 +156,10 @@ class _TaskScreenState extends State<TaskScreen> {
       final newTask = EventEntity(
         title: title,
         description: description,
-        dateInit: _dateInit,
-        dateFinish: _dateFinish,
-        isAllDay: false,
+        dateInit: finalDateInit,
+        dateFinish: finalDateFinish,
+        isAllDay: _isAllDay,
+        isDone: false,
       );
 
       context.read<TodoBloc>().add(TodoAdded(newTask));
@@ -160,6 +213,7 @@ class _TaskScreenState extends State<TaskScreen> {
           padding: const EdgeInsets.all(16),
           child: Column(
             children: [
+              //TODO: Agregar boton All day, campos por horario, modificar la validacion para que no necesariamente sea entre 2 fechas.
               GestureDetector(
                 onTap: _pickDateRange,
                 child: Container(

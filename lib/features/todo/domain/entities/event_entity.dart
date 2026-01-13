@@ -8,8 +8,9 @@ class EventEntity extends Equatable {
   final String? subTitle;
   final String? description;
   final DateTime dateInit;
-  final DateTime? dateFinish;
+  final DateTime dateFinish;
   final bool isAllDay;
+  final bool isDone;
   final int? color;
 
   const EventEntity({ 
@@ -18,8 +19,9 @@ class EventEntity extends Equatable {
     this.subTitle,
     this.description,
     required this.dateInit,
-    this.dateFinish,
+    required this.dateFinish,
     this.isAllDay = false,
+    this.isDone = false,
     this.color,
   });
 
@@ -31,6 +33,7 @@ class EventEntity extends Equatable {
     DateTime? dateInit,
     DateTime? dateFinish,
     bool? isAllDay,
+    bool? isDone,
     int? color,
   }) {
     return EventEntity(
@@ -41,12 +44,13 @@ class EventEntity extends Equatable {
       dateInit: dateInit ?? this.dateInit,
       dateFinish: dateFinish ?? this.dateFinish,
       isAllDay: isAllDay ?? this.isAllDay,
+      isDone: isDone ?? this.isDone,
       color: color ?? this.color,
     );
   }
   
   @override
   // TODO: implement props
-  List<Object?> get props => [id, title, subTitle, description, dateInit, dateFinish, isAllDay, color];
+  List<Object?> get props => [id, title, subTitle, description, dateInit, dateFinish, isAllDay, isDone, color];
 
 }

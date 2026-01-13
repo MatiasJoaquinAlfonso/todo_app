@@ -97,6 +97,19 @@ class $EventsTable extends Events with TableInfo<$EventsTable, Event> {
     ),
     defaultValue: const Constant(false),
   );
+  static const VerificationMeta _isDoneMeta = const VerificationMeta('isDone');
+  @override
+  late final GeneratedColumn<bool> isDone = GeneratedColumn<bool>(
+    'is_done',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("is_done" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
   static const VerificationMeta _colorMeta = const VerificationMeta('color');
   @override
   late final GeneratedColumn<int> color = GeneratedColumn<int>(
@@ -115,6 +128,7 @@ class $EventsTable extends Events with TableInfo<$EventsTable, Event> {
     dateInit,
     dateFinish,
     isAllDay,
+    isDone,
     color,
   ];
   @override
@@ -175,6 +189,12 @@ class $EventsTable extends Events with TableInfo<$EventsTable, Event> {
         isAllDay.isAcceptableOrUnknown(data['is_all_day']!, _isAllDayMeta),
       );
     }
+    if (data.containsKey('is_done')) {
+      context.handle(
+        _isDoneMeta,
+        isDone.isAcceptableOrUnknown(data['is_done']!, _isDoneMeta),
+      );
+    }
     if (data.containsKey('color')) {
       context.handle(
         _colorMeta,
@@ -218,6 +238,10 @@ class $EventsTable extends Events with TableInfo<$EventsTable, Event> {
         DriftSqlType.bool,
         data['${effectivePrefix}is_all_day'],
       )!,
+      isDone: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}is_done'],
+      )!,
       color: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
         data['${effectivePrefix}color'],
@@ -239,6 +263,7 @@ class Event extends DataClass implements Insertable<Event> {
   final DateTime dateInit;
   final DateTime? dateFinish;
   final bool isAllDay;
+  final bool isDone;
   final int? color;
   const Event({
     required this.id,
@@ -248,6 +273,7 @@ class Event extends DataClass implements Insertable<Event> {
     required this.dateInit,
     this.dateFinish,
     required this.isAllDay,
+    required this.isDone,
     this.color,
   });
   @override
@@ -266,6 +292,7 @@ class Event extends DataClass implements Insertable<Event> {
       map['date_finish'] = Variable<DateTime>(dateFinish);
     }
     map['is_all_day'] = Variable<bool>(isAllDay);
+    map['is_done'] = Variable<bool>(isDone);
     if (!nullToAbsent || color != null) {
       map['color'] = Variable<int>(color);
     }
@@ -287,6 +314,7 @@ class Event extends DataClass implements Insertable<Event> {
           ? const Value.absent()
           : Value(dateFinish),
       isAllDay: Value(isAllDay),
+      isDone: Value(isDone),
       color: color == null && nullToAbsent
           ? const Value.absent()
           : Value(color),
@@ -306,6 +334,7 @@ class Event extends DataClass implements Insertable<Event> {
       dateInit: serializer.fromJson<DateTime>(json['dateInit']),
       dateFinish: serializer.fromJson<DateTime?>(json['dateFinish']),
       isAllDay: serializer.fromJson<bool>(json['isAllDay']),
+      isDone: serializer.fromJson<bool>(json['isDone']),
       color: serializer.fromJson<int?>(json['color']),
     );
   }
@@ -320,6 +349,7 @@ class Event extends DataClass implements Insertable<Event> {
       'dateInit': serializer.toJson<DateTime>(dateInit),
       'dateFinish': serializer.toJson<DateTime?>(dateFinish),
       'isAllDay': serializer.toJson<bool>(isAllDay),
+      'isDone': serializer.toJson<bool>(isDone),
       'color': serializer.toJson<int?>(color),
     };
   }
@@ -332,6 +362,7 @@ class Event extends DataClass implements Insertable<Event> {
     DateTime? dateInit,
     Value<DateTime?> dateFinish = const Value.absent(),
     bool? isAllDay,
+    bool? isDone,
     Value<int?> color = const Value.absent(),
   }) => Event(
     id: id ?? this.id,
@@ -341,6 +372,7 @@ class Event extends DataClass implements Insertable<Event> {
     dateInit: dateInit ?? this.dateInit,
     dateFinish: dateFinish.present ? dateFinish.value : this.dateFinish,
     isAllDay: isAllDay ?? this.isAllDay,
+    isDone: isDone ?? this.isDone,
     color: color.present ? color.value : this.color,
   );
   Event copyWithCompanion(EventsCompanion data) {
@@ -356,6 +388,7 @@ class Event extends DataClass implements Insertable<Event> {
           ? data.dateFinish.value
           : this.dateFinish,
       isAllDay: data.isAllDay.present ? data.isAllDay.value : this.isAllDay,
+      isDone: data.isDone.present ? data.isDone.value : this.isDone,
       color: data.color.present ? data.color.value : this.color,
     );
   }
@@ -370,6 +403,7 @@ class Event extends DataClass implements Insertable<Event> {
           ..write('dateInit: $dateInit, ')
           ..write('dateFinish: $dateFinish, ')
           ..write('isAllDay: $isAllDay, ')
+          ..write('isDone: $isDone, ')
           ..write('color: $color')
           ..write(')'))
         .toString();
@@ -384,6 +418,7 @@ class Event extends DataClass implements Insertable<Event> {
     dateInit,
     dateFinish,
     isAllDay,
+    isDone,
     color,
   );
   @override
@@ -397,6 +432,7 @@ class Event extends DataClass implements Insertable<Event> {
           other.dateInit == this.dateInit &&
           other.dateFinish == this.dateFinish &&
           other.isAllDay == this.isAllDay &&
+          other.isDone == this.isDone &&
           other.color == this.color);
 }
 
@@ -408,6 +444,7 @@ class EventsCompanion extends UpdateCompanion<Event> {
   final Value<DateTime> dateInit;
   final Value<DateTime?> dateFinish;
   final Value<bool> isAllDay;
+  final Value<bool> isDone;
   final Value<int?> color;
   const EventsCompanion({
     this.id = const Value.absent(),
@@ -417,6 +454,7 @@ class EventsCompanion extends UpdateCompanion<Event> {
     this.dateInit = const Value.absent(),
     this.dateFinish = const Value.absent(),
     this.isAllDay = const Value.absent(),
+    this.isDone = const Value.absent(),
     this.color = const Value.absent(),
   });
   EventsCompanion.insert({
@@ -427,6 +465,7 @@ class EventsCompanion extends UpdateCompanion<Event> {
     required DateTime dateInit,
     this.dateFinish = const Value.absent(),
     this.isAllDay = const Value.absent(),
+    this.isDone = const Value.absent(),
     this.color = const Value.absent(),
   }) : title = Value(title),
        dateInit = Value(dateInit);
@@ -438,6 +477,7 @@ class EventsCompanion extends UpdateCompanion<Event> {
     Expression<DateTime>? dateInit,
     Expression<DateTime>? dateFinish,
     Expression<bool>? isAllDay,
+    Expression<bool>? isDone,
     Expression<int>? color,
   }) {
     return RawValuesInsertable({
@@ -448,6 +488,7 @@ class EventsCompanion extends UpdateCompanion<Event> {
       if (dateInit != null) 'date_init': dateInit,
       if (dateFinish != null) 'date_finish': dateFinish,
       if (isAllDay != null) 'is_all_day': isAllDay,
+      if (isDone != null) 'is_done': isDone,
       if (color != null) 'color': color,
     });
   }
@@ -460,6 +501,7 @@ class EventsCompanion extends UpdateCompanion<Event> {
     Value<DateTime>? dateInit,
     Value<DateTime?>? dateFinish,
     Value<bool>? isAllDay,
+    Value<bool>? isDone,
     Value<int?>? color,
   }) {
     return EventsCompanion(
@@ -470,6 +512,7 @@ class EventsCompanion extends UpdateCompanion<Event> {
       dateInit: dateInit ?? this.dateInit,
       dateFinish: dateFinish ?? this.dateFinish,
       isAllDay: isAllDay ?? this.isAllDay,
+      isDone: isDone ?? this.isDone,
       color: color ?? this.color,
     );
   }
@@ -498,6 +541,9 @@ class EventsCompanion extends UpdateCompanion<Event> {
     if (isAllDay.present) {
       map['is_all_day'] = Variable<bool>(isAllDay.value);
     }
+    if (isDone.present) {
+      map['is_done'] = Variable<bool>(isDone.value);
+    }
     if (color.present) {
       map['color'] = Variable<int>(color.value);
     }
@@ -514,6 +560,7 @@ class EventsCompanion extends UpdateCompanion<Event> {
           ..write('dateInit: $dateInit, ')
           ..write('dateFinish: $dateFinish, ')
           ..write('isAllDay: $isAllDay, ')
+          ..write('isDone: $isDone, ')
           ..write('color: $color')
           ..write(')'))
         .toString();
@@ -540,6 +587,7 @@ typedef $$EventsTableCreateCompanionBuilder =
       required DateTime dateInit,
       Value<DateTime?> dateFinish,
       Value<bool> isAllDay,
+      Value<bool> isDone,
       Value<int?> color,
     });
 typedef $$EventsTableUpdateCompanionBuilder =
@@ -551,6 +599,7 @@ typedef $$EventsTableUpdateCompanionBuilder =
       Value<DateTime> dateInit,
       Value<DateTime?> dateFinish,
       Value<bool> isAllDay,
+      Value<bool> isDone,
       Value<int?> color,
     });
 
@@ -595,6 +644,11 @@ class $$EventsTableFilterComposer
 
   ColumnFilters<bool> get isAllDay => $composableBuilder(
     column: $table.isAllDay,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get isDone => $composableBuilder(
+    column: $table.isDone,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -648,6 +702,11 @@ class $$EventsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<bool> get isDone => $composableBuilder(
+    column: $table.isDone,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<int> get color => $composableBuilder(
     column: $table.color,
     builder: (column) => ColumnOrderings(column),
@@ -688,6 +747,9 @@ class $$EventsTableAnnotationComposer
   GeneratedColumn<bool> get isAllDay =>
       $composableBuilder(column: $table.isAllDay, builder: (column) => column);
 
+  GeneratedColumn<bool> get isDone =>
+      $composableBuilder(column: $table.isDone, builder: (column) => column);
+
   GeneratedColumn<int> get color =>
       $composableBuilder(column: $table.color, builder: (column) => column);
 }
@@ -727,6 +789,7 @@ class $$EventsTableTableManager
                 Value<DateTime> dateInit = const Value.absent(),
                 Value<DateTime?> dateFinish = const Value.absent(),
                 Value<bool> isAllDay = const Value.absent(),
+                Value<bool> isDone = const Value.absent(),
                 Value<int?> color = const Value.absent(),
               }) => EventsCompanion(
                 id: id,
@@ -736,6 +799,7 @@ class $$EventsTableTableManager
                 dateInit: dateInit,
                 dateFinish: dateFinish,
                 isAllDay: isAllDay,
+                isDone: isDone,
                 color: color,
               ),
           createCompanionCallback:
@@ -747,6 +811,7 @@ class $$EventsTableTableManager
                 required DateTime dateInit,
                 Value<DateTime?> dateFinish = const Value.absent(),
                 Value<bool> isAllDay = const Value.absent(),
+                Value<bool> isDone = const Value.absent(),
                 Value<int?> color = const Value.absent(),
               }) => EventsCompanion.insert(
                 id: id,
@@ -756,6 +821,7 @@ class $$EventsTableTableManager
                 dateInit: dateInit,
                 dateFinish: dateFinish,
                 isAllDay: isAllDay,
+                isDone: isDone,
                 color: color,
               ),
           withReferenceMapper: (p0) => p0
