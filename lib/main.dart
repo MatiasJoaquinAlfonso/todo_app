@@ -8,33 +8,53 @@ import 'package:todo_app/features/todo/domain/repositories/event_repository.dart
 import 'package:todo_app/features/todo/presentation/bloc/bloc/todo_bloc.dart';
 
 void main() {
-  final db = AppDatabase();
 
-  runApp(MyApp(db: db));
+  WidgetsFlutterBinding.ensureInitialized();
+
+
+
+  runApp(MyApp());
 }
 
-class MyApp extends StatelessWidget {
-  final AppDatabase db;
+class MyApp extends StatefulWidget {
+  const MyApp({super.key});
 
-  const MyApp({super.key, required this.db});
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  late final AppDatabase _db;
+  late final EventRepository _repository;
+
+  @override
+  void initState() {
+    super.initState();
+    _db = AppDatabase();
+    _repository = EventRepositoryImpl(db: _db);  
+  }
+
+  @override
+  void dispose() {
+    _db.close();
+    super.dispose();
+  }
+
 
   @override
   Widget build(BuildContext context) {
     
-    return RepositoryProvider<EventRepository>(
-      create: (context) => EventRepositoryImpl(db: db),
+    return RepositoryProvider<EventRepository>.value(
+      value: _repository,
+      // create: (context) => EventRepositoryImpl(db: widget.db),
       child: BlocProvider(
-        create: (context) {
-          final repository = context.read<EventRepository>();
-          return TodoBloc(repository: repository)
-            ..add(TodoSubscriptionRequested());
-        },
+        create: (context) => TodoBloc(repository: _repository)
+          ..add(TodoSubscriptionRequested()),
         child: MaterialApp.router(
           debugShowCheckedModeBanner: false,
           title: 'To-Do App',
           theme: AppTheme(isDarkMode: true, selectedColor: 0).getTheme(),
           routerConfig: appRouter,
-          // home: HomePage(),
         ),
       ),
     );

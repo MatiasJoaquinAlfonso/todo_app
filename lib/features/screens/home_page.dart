@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:todo_app/features/shared/widgets/widgets.dart';
-// import 'package:todo_app/features/todo/domain/entities/event_entity.dart';
 import 'package:todo_app/features/todo/presentation/bloc/bloc/todo_bloc.dart';
 
 class HomePage extends StatelessWidget {
@@ -32,12 +31,26 @@ class HomePage extends StatelessWidget {
           }
 
           if (state is TodoError) {
-            return Center(child: Text('Error: ${state.errorMessage}'));
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children:[ 
+                  Icon(Icons.error_outline, size: 60, color: Colors.red.shade400),
+                  const SizedBox(height: 16),
+                  Text(
+                    'Error: ${state.errorMessage}',
+                    style: const TextStyle(fontSize: 16),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
+            );
           }
 
           if (state is TodoLoaded) {
             if (state.events.isEmpty){
               return Column(
+                mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 20.0),
@@ -124,30 +137,9 @@ class HomePage extends StatelessWidget {
 
           }
 
-          return Column(children: [
-            
-            Text('Iniciando... '),
-            CircularProgressIndicator(),
-
-          ],);
-          // return Container(child: Text('Iniciando...'),);
+          return Center(child: CircularProgressIndicator());
         },
       ),
-
-      // floatingActionButton: FloatingActionButton(
-      //   child: const Icon(Icons.add),
-      //   onPressed: () {
-      //     final newTask = EventEntity(
-      //       title: 'Tarea de Prueba ${DateTime.now().second}',
-      //       description: 'Creada automáticamente',
-      //       dateInit: DateTime.now(),
-      //       isAllDay: false,
-      //     );
-          
-      //     context.read<TodoBloc>().add(TodoAdded(newTask));
-      //   },
-      // ),
-
     );
   }
 }

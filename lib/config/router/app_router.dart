@@ -57,6 +57,9 @@ final appRouter = GoRouter(
       },
     ),
 
-  ]
+  ],
+
+  debugLogDiagnostics: false,
+  restorationScopeId: 'app',
 
 );
