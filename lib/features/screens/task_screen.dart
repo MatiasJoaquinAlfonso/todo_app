@@ -19,12 +19,12 @@ class _TaskScreenState extends State<TaskScreen> {
   final _descriptionController = TextEditingController();
   DateTime _dateInit = DateTime.now();
   DateTime _dateFinish = DateTime.now();
-  bool _isAllDay = false;
   TimeOfDay _timeInit = TimeOfDay.now();
   TimeOfDay _timeFinish = TimeOfDay.now();
-  bool _shouldSave = true;
-
   bool get _isEditing => widget.event != null;
+  bool _shouldSave = true;
+  bool _allowPop = false;
+  bool _isAllDay = false;
 
   @override
   void initState() {
@@ -117,57 +117,13 @@ class _TaskScreenState extends State<TaskScreen> {
     return DateTime(date.year, date.month, date.day, time.hour, time.minute);
   }
 
-  void _showAlert({
-    required String title,
-    required String message,
-    String? cancelText,     // Texto botón cancelar (opcional)
-    String? confirmText,    // Texto botón confirmar
-    VoidCallback? onConfirm, // Qué hacer si confirma
-    bool isError = false,   // ¿Es un error o una pregunta?
-  }) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog.adaptive(
-        title: Text(title),
-        content: Text(message),
-        actions: [
-          // Botón Cancelar (Solo si pasamos texto para él)
-          if (cancelText != null)
-            TextButton(
-              onPressed: () => context.pop(), // Cierra el cartel
-              child: Text(cancelText, style: const TextStyle(color: Colors.blue)),
-            ),
-
-          // Botón Confirmar (o "OK" si es error)
-          TextButton(
-            onPressed: () {
-              context.pop(); // Cierra el cartel primero
-              if (onConfirm != null) onConfirm(); // Ejecuta la acción
-            },
-            child: Text(
-              confirmText ?? "OK",
-              // Si es error o destructivo, lo ponemos rojo, sino azul
-              style: TextStyle(
-                color: isError ? Colors.red : Colors.blue, 
-                fontWeight: FontWeight.bold
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-
-  void _saveTask() {
+  bool _saveTask() {
     final title = _titleController.text.trim();
     final description = _descriptionController.text.trim();
     DateTime finalDateInit;
     DateTime finalDateFinish;
 
-    if (!_shouldSave) return;
-
-
+    if (!_shouldSave) return true;
 
     if (_isAllDay) {
       finalDateInit = DateTime(_dateInit.year, _dateInit.month, _dateInit.day, 0, 0);
@@ -178,14 +134,15 @@ class _TaskScreenState extends State<TaskScreen> {
     }    
 
     if (finalDateFinish.isBefore(finalDateInit)){
-      
-      _showAlert(
-        title: "Fecha invalida", 
-        message: "Si el dia es el mismo, el horario de fin no puede ser anterior al horario de inicio.",
+      DialogUtils.show(
+        context: context,
+        title: "Fecha inválida", 
+        message: "El horario de fin no puede ser anterior al horario de inicio.",
+        cancelText: "Seguir editando",
+        confirmText: "Descartar",
         isError: true,
       );
-
-      return;
+      return false;
     }
 
     if (_isEditing) {
@@ -196,9 +153,7 @@ class _TaskScreenState extends State<TaskScreen> {
         dateFinish: finalDateFinish,
         isAllDay: _isAllDay,
       );
-
       context.read<TodoBloc>().add(TodoUpdated(updatedTask));
-      return;
     } else {
       final newTask = EventEntity(
         title: title,
@@ -208,10 +163,11 @@ class _TaskScreenState extends State<TaskScreen> {
         isAllDay: _isAllDay,
         isDone: false,
       );
-
       context.read<TodoBloc>().add(TodoAdded(newTask));
-      return;
     }
+
+    return true;
+
   }
 
   void _deleteTask() {
@@ -226,35 +182,51 @@ class _TaskScreenState extends State<TaskScreen> {
   @override
   Widget build(BuildContext context) {
     return PopScope(
-      canPop: false,
+      canPop: _allowPop,
       onPopInvokedWithResult: (didPop, result) {
         if (didPop) return;
 
+        final description = _descriptionController.text.trim();
         final title = _titleController.text.trim();
 
-        if (title.isEmpty){
-          _showAlert(
+        if (title.isEmpty && description.isEmpty){
+          context.pop();
+          return;
+        }
+
+        if (title.isEmpty && description.isNotEmpty){
+          DialogUtils.show(
+            context: context,
             title: "¿Descartar cambios?", 
             message: "La tarea no tiene título y no se guardará.",
             cancelText: "Seguir editando",
             confirmText: "Descartar",
             isError: true,
             onConfirm: () {
-              if(context.mounted) context.pop();
+              setState(() => _allowPop = true);
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                if(context.mounted) context.pop();
+              });
+
             },
           );
           return;
         }
 
-        _saveTask();
-        if(context.mounted) context.pop();
-
+        // 4. Intentar guardar
+        final guardadoExitoso = _saveTask();
+        if (guardadoExitoso) {
+          setState(() => _allowPop = true);
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (mounted) Navigator.of(context).pop();
+          });
+        }
       },
       child: Scaffold(
         appBar: AppBar(
           leading: IconButton(
             onPressed: () {
-              context.pop();
+              Navigator.of(context).maybePop();
             },
             icon: const Icon(Icons.keyboard_arrow_left_rounded),
           ),
