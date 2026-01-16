@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:todo_app/features/todo/domain/entities/event_entity.dart';
 import 'package:todo_app/features/todo/presentation/bloc/bloc/todo_bloc.dart';
+import '../shared/widgets/widgets.dart';
 
 class TaskScreen extends StatefulWidget {
   final EventEntity? event;
@@ -21,7 +22,6 @@ class _TaskScreenState extends State<TaskScreen> {
   bool _isAllDay = false;
   TimeOfDay _timeInit = TimeOfDay.now();
   TimeOfDay _timeFinish = TimeOfDay.now();
-
   bool _shouldSave = true;
 
   bool get _isEditing => widget.event != null;
@@ -50,7 +50,6 @@ class _TaskScreenState extends State<TaskScreen> {
 
   Future<void> _pickDateRange() async {
     final now = DateTime.now();
-    // final firstDate = widget.event?.dateInit ?? now;
 
     final DateTimeRange? picked = await showDateRangePicker(
       context: context,
@@ -81,6 +80,7 @@ class _TaskScreenState extends State<TaskScreen> {
       });
     }
   }
+
 
   Future<void> _pickTime ({required bool isStart}) async {
     final picked = await showTimePicker(
@@ -117,6 +117,47 @@ class _TaskScreenState extends State<TaskScreen> {
     return DateTime(date.year, date.month, date.day, time.hour, time.minute);
   }
 
+  void _showAlert({
+    required String title,
+    required String message,
+    String? cancelText,     // Texto botón cancelar (opcional)
+    String? confirmText,    // Texto botón confirmar
+    VoidCallback? onConfirm, // Qué hacer si confirma
+    bool isError = false,   // ¿Es un error o una pregunta?
+  }) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog.adaptive(
+        title: Text(title),
+        content: Text(message),
+        actions: [
+          // Botón Cancelar (Solo si pasamos texto para él)
+          if (cancelText != null)
+            TextButton(
+              onPressed: () => context.pop(), // Cierra el cartel
+              child: Text(cancelText, style: const TextStyle(color: Colors.blue)),
+            ),
+
+          // Botón Confirmar (o "OK" si es error)
+          TextButton(
+            onPressed: () {
+              context.pop(); // Cierra el cartel primero
+              if (onConfirm != null) onConfirm(); // Ejecuta la acción
+            },
+            child: Text(
+              confirmText ?? "OK",
+              // Si es error o destructivo, lo ponemos rojo, sino azul
+              style: TextStyle(
+                color: isError ? Colors.red : Colors.blue, 
+                fontWeight: FontWeight.bold
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
 
   void _saveTask() {
     final title = _titleController.text.trim();
@@ -124,14 +165,9 @@ class _TaskScreenState extends State<TaskScreen> {
     DateTime finalDateInit;
     DateTime finalDateFinish;
 
-
     if (!_shouldSave) return;
-    if (title.isEmpty && !_isEditing) return;
 
-    if (title.isEmpty && _isEditing) {
-      //TODO: Si borran el titulo y estan editando, validar si quiere no guardar o cancelar.
-      return;
-    }
+
 
     if (_isAllDay) {
       finalDateInit = DateTime(_dateInit.year, _dateInit.month, _dateInit.day, 0, 0);
@@ -139,9 +175,19 @@ class _TaskScreenState extends State<TaskScreen> {
     } else {
       finalDateInit = _joinDateTime(_dateInit, _timeInit);
       finalDateFinish = _joinDateTime(_dateFinish, _timeFinish);
+    }    
+
+    if (finalDateFinish.isBefore(finalDateInit)){
+      
+      _showAlert(
+        title: "Fecha invalida", 
+        message: "Si el dia es el mismo, el horario de fin no puede ser anterior al horario de inicio.",
+        isError: true,
+      );
+
+      return;
     }
 
-    //TODO: Completar los campos hardcoded
     if (_isEditing) {
       final updatedTask = widget.event!.copyWith(
         title: title,
@@ -152,6 +198,7 @@ class _TaskScreenState extends State<TaskScreen> {
       );
 
       context.read<TodoBloc>().add(TodoUpdated(updatedTask));
+      return;
     } else {
       final newTask = EventEntity(
         title: title,
@@ -163,6 +210,7 @@ class _TaskScreenState extends State<TaskScreen> {
       );
 
       context.read<TodoBloc>().add(TodoAdded(newTask));
+      return;
     }
   }
 
@@ -178,11 +226,29 @@ class _TaskScreenState extends State<TaskScreen> {
   @override
   Widget build(BuildContext context) {
     return PopScope(
-      canPop: true,
+      canPop: false,
       onPopInvokedWithResult: (didPop, result) {
-        if (didPop) {
-          _saveTask();
+        if (didPop) return;
+
+        final title = _titleController.text.trim();
+
+        if (title.isEmpty){
+          _showAlert(
+            title: "¿Descartar cambios?", 
+            message: "La tarea no tiene título y no se guardará.",
+            cancelText: "Seguir editando",
+            confirmText: "Descartar",
+            isError: true,
+            onConfirm: () {
+              if(context.mounted) context.pop();
+            },
+          );
+          return;
         }
+
+        _saveTask();
+        if(context.mounted) context.pop();
+
       },
       child: Scaffold(
         appBar: AppBar(
@@ -194,7 +260,7 @@ class _TaskScreenState extends State<TaskScreen> {
           ),
           title: TextFormField(
             controller: _titleController,
-            style: const TextStyle(fontWeight: FontWeight.w900),
+            style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 23),
             decoration: const InputDecoration(
               hintText: 'Nueva tarea',
               border: InputBorder.none,
@@ -213,53 +279,57 @@ class _TaskScreenState extends State<TaskScreen> {
           padding: const EdgeInsets.all(16),
           child: Column(
             children: [
-              //TODO: Agregar boton All day, campos por horario, modificar la validacion para que no necesariamente sea entre 2 fechas.
-              GestureDetector(
-                onTap: _pickDateRange,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    vertical: 10,
-                    horizontal: 12,
-                  ),
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey.withValues(alpha: 0.3)),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Row(
-                    children: [
-                      const Icon(Icons.calendar_today_rounded, color: Colors.blueAccent, size: 20),
-                      const SizedBox(width: 12),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text("Inicio", style: TextStyle(fontSize: 12,color: Colors.grey[400])),
 
-                          Text(
-                            "${_dateInit.day}/${_dateInit.month}/${_dateInit.year}",
-                            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-                          ),
-                        ],
-                      ),
-                      const Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 16.0),
-                        child: Icon(Icons.arrow_forward_ios_rounded, size: 16, color: Colors.grey),
-                      ),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text("Fin", style: TextStyle(fontSize: 12, color: Colors.grey[400])),
+              DateTimeSelector(
+                icon: Icons.calendar_today_rounded,
+                label1: "Inicio", 
+                value1: "${_dateInit.day}/${_dateInit.month}/${_dateInit.year}", 
+                onTap1: () => _pickDateRange(),
+                label2: "Fin", 
+                value2: "${_dateFinish.day}/${_dateFinish.month}/${_dateFinish.year}",
+                onTap2: () => _pickDateRange(),
 
-                          Text(
-                            "${_dateFinish.day}/${_dateFinish.month}/${_dateFinish.year}",
-                            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-                          ),
-                        ],
+                trailing: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text("Todo el día?", style: TextStyle(fontSize: 13, color: Colors.grey[400])),
+
+                    SizedBox(height: 6),
+
+                    SizedBox(
+                      height: 24,
+                      child: Transform.scale(
+                        scale: 0.9,
+                        child: Switch(
+                          value: _isAllDay,
+                          activeThumbColor: Colors.blueAccent,
+                          inactiveThumbColor: Colors.blueAccent,
+                          trackOutlineColor: WidgetStateProperty.all(Colors.transparent),
+                          onChanged: (val) => setState(() => _isAllDay =val ), 
+                        ),
                       ),
-                    ],
-                  ),
+                    )
+                  ],
                 ),
+
               ),
+
               const SizedBox(height: 12),
+
+              if (_isAllDay == false)
+              DateTimeSelector(
+                icon: Icons.access_time_rounded, 
+                label1: "Hora inicio", 
+                value1: _timeInit.format(context), 
+                onTap1: () => _pickTime(isStart: true),
+                label2: "Hora fin", 
+                value2: _timeFinish.format(context),
+                onTap2: () => _pickTime(isStart: false),
+                trailing: null,
+              ),
+
+              const SizedBox(height: 12),
+
               Expanded(
                 child: TextFormField(
                   controller: _descriptionController,
