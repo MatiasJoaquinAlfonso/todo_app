@@ -1,8 +1,9 @@
+import 'dart:io';
 import 'package:drift/drift.dart';
-import 'package:drift_flutter/drift_flutter.dart';
-
+import 'package:drift/native.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:path/path.dart' as p;
 part 'database.g.dart';
-
 
 class Events extends Table {
   IntColumn get id => integer().autoIncrement()();
@@ -49,6 +50,12 @@ class AppDatabase extends _$AppDatabase {
 
 }
 
-QueryExecutor _openConnection() {
-  return driftDatabase(name: 'todo-app-db');
+// Abrimos la base de datos en el hilo principal para evitar errores de comunicacion entre hilos
+// Se realizo este cambio porque la app se pausaba sola constantemente.
+LazyDatabase _openConnection() {
+  return LazyDatabase(() async {
+    final dbFolder = await getApplicationDocumentsDirectory();
+    final file = File(p.join(dbFolder.path, 'todo-app-db.sqlite'));
+    return NativeDatabase(file); 
+  });
 }
