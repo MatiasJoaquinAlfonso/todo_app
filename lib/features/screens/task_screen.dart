@@ -166,6 +166,15 @@ class _TaskScreenState extends State<TaskScreen> {
       context.read<TodoBloc>().add(TodoAdded(newTask));
     }
 
+    // final notificationID = DateTime.now().millisecondsSinceEpoch % 100000;
+
+    // NotificationService().scheduleNotification(
+    //   id: notificationID,
+    //   title: "Recordatorio: $title",
+    //   body: description.isNotEmpty ? description : "¡Es hora de tu tarea!",
+    //   scheduledDate: finalDateInit, // Usamos la fecha de inicio
+    // );
+
     return true;
 
   }

@@ -7,7 +7,11 @@ import 'package:todo_app/features/todo/data/repositories/event_repository_impl.d
 import 'package:todo_app/features/todo/domain/repositories/event_repository.dart';
 import 'package:todo_app/features/todo/presentation/bloc/bloc/todo_bloc.dart';
 
-void main() {
+
+void main() async {
+
+  WidgetsFlutterBinding.ensureInitialized();
+
   final db = AppDatabase();
 
   runApp(MyApp(db: db));
