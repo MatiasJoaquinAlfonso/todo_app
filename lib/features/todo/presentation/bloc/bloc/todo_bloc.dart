@@ -1,4 +1,4 @@
-import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:todo_app/features/todo/domain/entities/event_entity.dart';
 import 'package:todo_app/features/todo/domain/repositories/event_repository.dart';
