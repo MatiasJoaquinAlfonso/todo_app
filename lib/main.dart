@@ -6,11 +6,16 @@ import 'package:todo_app/features/database/database.dart';
 import 'package:todo_app/features/todo/data/repositories/event_repository_impl.dart';
 import 'package:todo_app/features/todo/domain/repositories/event_repository.dart';
 import 'package:todo_app/features/todo/presentation/bloc/bloc/todo_bloc.dart';
+import 'package:todo_app/features/shared/services/notification_service.dart';
 
 
 void main() async {
 
   WidgetsFlutterBinding.ensureInitialized();
+
+  await NotificationService().init();
+  //Apenas iniciamos la app solicitamos los permisos.
+  NotificationService().requestPermissions();
 
   final db = AppDatabase();
 

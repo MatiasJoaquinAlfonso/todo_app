@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:todo_app/features/shared/services/notification_service.dart';
 import 'package:todo_app/features/todo/domain/entities/event_entity.dart';
 import 'package:todo_app/features/todo/presentation/bloc/bloc/todo_bloc.dart';
 import '../shared/widgets/widgets.dart';
@@ -34,7 +35,7 @@ class _TaskScreenState extends State<TaskScreen> {
       _titleController.text = widget.event!.title;
       _descriptionController.text = widget.event!.description ?? '';
       _dateInit = widget.event!.dateInit;
-      _dateFinish = widget.event!.dateInit;
+      _dateFinish = widget.event!.dateFinish;
       _isAllDay = widget.event!.isAllDay;
       _timeInit = TimeOfDay.fromDateTime(widget.event!.dateInit);
       _timeFinish = TimeOfDay.fromDateTime(widget.event!.dateFinish);
@@ -166,18 +167,46 @@ class _TaskScreenState extends State<TaskScreen> {
       context.read<TodoBloc>().add(TodoAdded(newTask));
     }
 
-    // final notificationID = DateTime.now().millisecondsSinceEpoch % 100000;
-
-    // NotificationService().scheduleNotification(
-    //   id: notificationID,
-    //   title: "Recordatorio: $title",
-    //   body: description.isNotEmpty ? description : "¡Es hora de tu tarea!",
-    //   scheduledDate: finalDateInit, // Usamos la fecha de inicio
-    // );
+    _scheduleNotification(title, description, finalDateInit, finalDateFinish);
 
     return true;
+  }
+
+
+  Future<void> _scheduleNotification (String title, String description, DateTime dateInit, DateTime dateFinish) async {
+
+    final difference = dateFinish.difference(dateInit).inDays;
+
+    final daysToSchedule = difference == 0 ? 1 : difference + 1;
+
+    for (int i = 0; i < daysToSchedule; i++){
+
+        DateTime alertDate = dateInit.add(Duration(days: i));
+
+      if(_isAllDay){
+        alertDate = DateTime(alertDate.year, alertDate.month, alertDate.day, 9, 0);
+      } else {
+        alertDate = DateTime (
+          alertDate.year,
+          alertDate.month,
+          alertDate.day,
+          _timeInit.hour,
+          _timeInit.minute,
+        );
+      }
+      // Creamos un ID temporal.
+      final notificationID = DateTime.now().millisecondsSinceEpoch % 100000;
+      await NotificationService().scheduleNotification(
+        id: notificationID,
+        title: "Recordatorio: $title",
+        body: description.isNotEmpty ? description : "¡Es hora de tu tarea!",
+        scheduledDate: alertDate,
+      );
+
+    }
 
   }
+
 
   void _deleteTask() {
     _shouldSave = false;
@@ -257,71 +286,83 @@ class _TaskScreenState extends State<TaskScreen> {
           ],
         ),
         body: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            children: [
-
-              DateTimeSelector(
-                icon: Icons.calendar_today_rounded,
-                label1: "Inicio", 
-                value1: "${_dateInit.day}/${_dateInit.month}/${_dateInit.year}", 
-                onTap1: () => _pickDateRange(),
-                label2: "Fin", 
-                value2: "${_dateFinish.day}/${_dateFinish.month}/${_dateFinish.year}",
-                onTap2: () => _pickDateRange(),
-
-                trailing: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text("Todo el día?", style: TextStyle(fontSize: 13, color: Colors.grey[400])),
-
-                    SizedBox(height: 6),
-
-                    SizedBox(
-                      height: 24,
-                      child: Transform.scale(
-                        scale: 0.9,
-                        child: Switch(
-                          value: _isAllDay,
-                          activeThumbColor: Colors.blueAccent,
-                          inactiveThumbColor: Colors.blueAccent,
-                          trackOutlineColor: WidgetStateProperty.all(Colors.transparent),
-                          onChanged: (val) => setState(() => _isAllDay =val ), 
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: CustomScrollView(
+            slivers: [
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 16),
+                  child: Column(
+                    children: [
+                      DateTimeSelector(
+                        icon: Icons.calendar_today_rounded,
+                        label1: "Inicio", 
+                        value1: "${_dateInit.day}/${_dateInit.month}/${_dateInit.year}", 
+                        onTap1: () => _pickDateRange(),
+                        label2: "Fin", 
+                        value2: "${_dateFinish.day}/${_dateFinish.month}/${_dateFinish.year}",
+                        onTap2: () => _pickDateRange(),
+          
+                        trailing: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text("Todo el día?", style: TextStyle(fontSize: 13, color: Colors.grey[400])),
+          
+                            SizedBox(height: 6),
+          
+                            SizedBox(
+                              height: 24,
+                              child: Transform.scale(
+                                scale: 0.9,
+                                child: Switch(
+                                  value: _isAllDay,
+                                  activeThumbColor: Colors.blueAccent,
+                                  inactiveThumbColor: Colors.blueAccent,
+                                  trackOutlineColor: WidgetStateProperty.all(Colors.transparent),
+                                  onChanged: (val) => setState(() => _isAllDay =val ), 
+                                ),
+                              ),
+                            )
+                          ],
                         ),
+          
                       ),
-                    )
-                  ],
-                ),
-
-              ),
-
-              const SizedBox(height: 12),
-
-              if (_isAllDay == false)
-              DateTimeSelector(
-                icon: Icons.access_time_rounded, 
-                label1: "Hora inicio", 
-                value1: _timeInit.format(context), 
-                onTap1: () => _pickTime(isStart: true),
-                label2: "Hora fin", 
-                value2: _timeFinish.format(context),
-                onTap2: () => _pickTime(isStart: false),
-                trailing: null,
-              ),
-
-              const SizedBox(height: 12),
-
-              Expanded(
-                child: TextFormField(
-                  controller: _descriptionController,
-                  decoration: const InputDecoration(
-                    hintText: 'Descripción',
-                    border: InputBorder.none,
+          
+                      const SizedBox(height: 12),
+          
+                      if (_isAllDay == false)
+                      DateTimeSelector(
+                        icon: Icons.access_time_rounded, 
+                        label1: "Hora inicio", 
+                        value1: _timeInit.format(context), 
+                        onTap1: () => _pickTime(isStart: true),
+                        label2: "Hora fin", 
+                        value2: _timeFinish.format(context),
+                        onTap2: () => _pickTime(isStart: false),
+                        trailing: null,
+                      ),
+                      
+                      const SizedBox(height: 12),
+                    ],
                   ),
-                  maxLines: null,
-                  keyboardType: TextInputType.multiline,
-                  expands: true,
-                  textAlignVertical: TextAlignVertical.top,
+                ),
+              ),
+
+              SliverFillRemaining(
+                hasScrollBody: false,
+                child: Padding(
+                  padding: const EdgeInsets.only(bottom: 16),
+                  child: TextFormField(
+                    controller: _descriptionController,
+                    decoration: const InputDecoration(
+                      hintText: 'Descripción',
+                      border: InputBorder.none,
+                    ),
+                    maxLines: null,
+                    keyboardType: TextInputType.multiline,
+                    expands: true,
+                    textAlignVertical: TextAlignVertical.top,
+                  ),
                 ),
               ),
             ],
