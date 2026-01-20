@@ -30,7 +30,7 @@ class NotificationService {
         requestAlertPermission: false,
         requestBadgePermission: false,
         requestSoundPermission: false,
-
+        
         // Para mostrar la notificación aunque este la app abierta.
         defaultPresentAlert: true,
         defaultPresentBadge: true,
@@ -115,6 +115,7 @@ class NotificationService {
       presentAlert: true,
       presentBadge: true,
       presentSound: true,
+      threadIdentifier: 'my_thread_id',
     );
 
     // Unificamos las llamadas a la funcion.
@@ -131,11 +132,11 @@ class NotificationService {
       details, 
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
     );
-    
+
     logger.i(
       "La notificación con id: $id titulo: $title, dia: $tzDate", 
     );
-  }
 
+  }
 
 }

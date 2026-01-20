@@ -12,10 +12,11 @@ import 'package:todo_app/features/shared/services/notification_service.dart';
 void main() async {
 
   WidgetsFlutterBinding.ensureInitialized();
-
-  await NotificationService().init();
+  
+  final NotificationService notificationService = NotificationService();
+  await notificationService.init();
   //Apenas iniciamos la app solicitamos los permisos.
-  NotificationService().requestPermissions();
+  notificationService.requestPermissions();
 
   final db = AppDatabase();
 

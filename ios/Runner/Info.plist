@@ -46,11 +46,16 @@
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>UIBackgroundModes</key>
-    <array>
-        <string>fetch</string>
-        <string>remote-notification</string>
-    </array>
-    <key>NSLocalNetworkUsageDescription</key>
-    <string>Necesario para notificaciones locales</string>
+	<array>
+	    <string>remote-notification</string>
+	</array>
+	<key>aps</key>
+	<dict>
+	    <key>UNNotificationExtension</key>
+	    <dict>
+	        <key>UNNotificationExtensionCategory</key>
+	        <string>myCategory</string>
+	    </dict>
+	</dict>
 </dict>
 </plist>
