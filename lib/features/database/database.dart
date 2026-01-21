@@ -3,30 +3,43 @@ import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
+import 'tables/tables.dart';
 part 'database.g.dart';
 
-class Events extends Table {
-  IntColumn get id => integer().autoIncrement()();
-  TextColumn get title => text().withLength(min: 1, max: 100)();
-  TextColumn get subTitle => text().withLength(min: 1, max: 150).nullable()();
-  TextColumn get description => text().nullable()();
 
-  // Fechas
-  DateTimeColumn get dateInit => dateTime()();
-  DateTimeColumn get dateFinish => dateTime()();
-  
-  // Flags
-  BoolColumn get isAllDay => boolean().withDefault(const Constant(false))();
-  BoolColumn get isDone => boolean().withDefault(const Constant(false))();
-  IntColumn get color => integer().nullable()();
-}
 
-@DriftDatabase(tables: [Events])
+
+@DriftDatabase(tables: [Events, NotificationTable])
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
+
+  @override
+  MigrationStrategy get migration => MigrationStrategy(
+
+    // Habilito las foreing Keys en SQL Lite y el Cascade Delete. 
+    // Esto evita que no queden registros de notificaciones relacionadas a tareas borradas.
+    beforeOpen: (details) async {
+      await customStatement('PRAGMA foreing_key = ON');
+    },
+
+    // Si es una instalacion nueva crea todo de 0.
+    onCreate: (m) async {
+      await m.createAll();
+    },
+
+    onUpgrade: (m, from, to) async {
+      // Si actualizamos la app, las tareas ya creadas por el usuario no se borran.
+      // Solo se crea en este caso esta tabla nueva.
+      if (from < 2) {
+        await m.createTable(notificationTable);
+      }
+    },
+
+  );
+
 
   Future<List<Event>> getAllEvents(){
     return select(events).get();
