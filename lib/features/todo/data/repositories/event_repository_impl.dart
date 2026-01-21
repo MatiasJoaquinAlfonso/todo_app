@@ -28,8 +28,8 @@ class EventRepositoryImpl extends EventRepository {
   }
 
   @override
-  Future<void> saveEvent(EventEntity event) async {
-    await db.insertEvent(event.toCompanion());
+  Future<int> saveEvent(EventEntity event) async {
+    return await db.insertEvent(event.toCompanion());
   }
 
   @override
@@ -40,6 +40,22 @@ class EventRepositoryImpl extends EventRepository {
   @override
   Future<void> deleteEvent(EventEntity event) async {
     await db.delete(db.events).delete(event.toCompanion());
+  }
+  
+  @override
+  Future<int> addNotification(NotificationTableCompanion notification) async {
+    return await db.into(db.notificationTable).insert(notification);
+  }
+  
+  @override
+  Future<List<NotificationTableData>> getNotifications(int taskId) async {
+
+    final query = db.select(db.notificationTable)..where((tbl) => tbl.eventId.equals(taskId));
+
+    final result = await query.get();
+
+    return result;
+
   }
 
 }

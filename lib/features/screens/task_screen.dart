@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:todo_app/features/shared/services/notification_service.dart';
 import 'package:todo_app/features/todo/domain/entities/event_entity.dart';
 import 'package:todo_app/features/todo/presentation/bloc/bloc/todo_bloc.dart';
 import '../shared/widgets/widgets.dart';
@@ -167,46 +166,8 @@ class _TaskScreenState extends State<TaskScreen> {
       context.read<TodoBloc>().add(TodoAdded(newTask));
     }
 
-    _scheduleNotification(title, description, finalDateInit, finalDateFinish);
-
     return true;
   }
-
-
-  Future<void> _scheduleNotification (String title, String description, DateTime dateInit, DateTime dateFinish) async {
-
-    final difference = dateFinish.difference(dateInit).inDays;
-
-    final daysToSchedule = difference == 0 ? 1 : difference + 1;
-
-    for (int i = 0; i < daysToSchedule; i++){
-
-        DateTime alertDate = dateInit.add(Duration(days: i));
-
-      if(_isAllDay){
-        alertDate = DateTime(alertDate.year, alertDate.month, alertDate.day, 9, 0);
-      } else {
-        alertDate = DateTime (
-          alertDate.year,
-          alertDate.month,
-          alertDate.day,
-          _timeInit.hour,
-          _timeInit.minute,
-        );
-      }
-      // Creamos un ID temporal.
-      final notificationID = DateTime.now().millisecondsSinceEpoch % 100000;
-      await NotificationService().scheduleNotification(
-        id: notificationID,
-        title: "Recordatorio: $title",
-        body: description.isNotEmpty ? description : "¡Es hora de tu tarea!",
-        scheduledDate: alertDate,
-      );
-
-    }
-
-  }
-
 
   void _deleteTask() {
     _shouldSave = false;
