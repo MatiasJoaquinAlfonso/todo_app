@@ -16,4 +16,6 @@ abstract class EventRepository {
   Future<int> addNotification(NotificationTableCompanion notification);
 
   Future<List<NotificationTableData>> getNotifications(int taskId);
+
+  Future<void> deleteNotifications(int taskId);
 }

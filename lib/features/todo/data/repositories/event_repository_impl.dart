@@ -49,13 +49,14 @@ class EventRepositoryImpl extends EventRepository {
   
   @override
   Future<List<NotificationTableData>> getNotifications(int taskId) async {
-
     final query = db.select(db.notificationTable)..where((tbl) => tbl.eventId.equals(taskId));
-
     final result = await query.get();
-
     return result;
-
+  }
+  
+  @override
+  Future<void> deleteNotifications(int taskId) async {
+    await (db.delete(db.notificationTable)..where((tbl) => tbl.eventId.equals(taskId))).go();
   }
 
 }

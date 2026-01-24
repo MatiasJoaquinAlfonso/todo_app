@@ -46,46 +46,7 @@ class TodoBloc extends Bloc<TodoEvent, TodoState> {
     
     try {
       taskId = await _repository.saveEvent(event.event);  
-
-      final difference = event.event.dateFinish.difference(event.event.dateInit).inDays;
-
-      final int daysToSchedule = difference == 0 ? 1 : difference + 1;
-
-      for(int i=0; i < daysToSchedule; i++){
-
-        DateTime alertDate = event.event.dateInit.add(Duration(days: i));
-        
-        if(event.event.isAllDay){
-          alertDate = DateTime(alertDate.year, alertDate.month, alertDate.day, 9, 0);
-        }else{
-          alertDate = DateTime(
-            alertDate.year,
-            alertDate.month,
-            alertDate.day,
-            event.event.dateInit.hour,
-            event.event.dateInit.minute,
-          );
-        }
-
-        final notificationData = NotificationTableCompanion(
-          eventId: Value(taskId),
-          scheduleDate: Value(alertDate),
-        );
-
-        final int notificationId = await _repository.addNotification(notificationData);
-
-        final String bodyText = (event.event.description != null && event.event.description!.isNotEmpty)
-            ? event.event.description!
-            : "Tienes una tarea pendiente.";
-
-        await NotificationService().scheduleNotification(
-          id: notificationId, 
-          title: event.event.title, 
-          body: bodyText,
-          scheduledDate: alertDate
-        );
-
-      }
+      await _scheduleNotifications(taskId, event.event);
 
     } catch (e) {
       emit(TodoError("Error al guardar tarea: $e"));
@@ -99,13 +60,9 @@ class TodoBloc extends Bloc<TodoEvent, TodoState> {
   ) async {
     
     try {
-      if (event.event.id != null){
-        final idNotifications = await _repository.getNotifications(event.event.id!);
-        for (final notification in idNotifications) {
-          await NotificationService().cancelNotification(notification.id);
-        }
-      }
-
+      if (event.event.id == null) return;
+   
+        await _deleteSecheduleNotification(event.event.id!);
         await _repository.deleteEvent(event.event);  
     } catch (e) {
       emit(TodoError("Error al borrar la tarea: $e"));
@@ -117,14 +74,75 @@ class TodoBloc extends Bloc<TodoEvent, TodoState> {
     TodoUpdated event,
     Emitter<TodoState> emit,
   ) async {
-    
+
     try {
+
+      if (event.event.id == null) return;
+
+      await _deleteSecheduleNotification(event.event.id!);
       await _repository.updateEvent(event.event);  
+      await _scheduleNotifications(event.event.id!, event.event);
+
     } catch (e) {
       emit(TodoError("Error al actualizar la tarea: $e"));
     }    
   }
  
+  Future<void> _scheduleNotifications(int taskId, EventEntity event) async {
+
+    final difference = event.dateFinish.difference(event.dateInit).inDays;
+
+    final int daysToSchedule = difference == 0 ? 1 : difference + 1;
+
+    for(int i=0; i < daysToSchedule; i++){
+
+      DateTime alertDate = event.dateInit.add(Duration(days: i));
+        
+      if(event.isAllDay){
+        alertDate = DateTime(alertDate.year, alertDate.month, alertDate.day, 9, 0);
+      }else{
+        alertDate = DateTime(
+          alertDate.year,
+          alertDate.month,
+          alertDate.day,
+          event.dateInit.hour,
+          event.dateInit.minute,
+        );
+      }
+
+      final notificationData = NotificationTableCompanion(
+        eventId: Value(taskId),
+        scheduleDate: Value(alertDate),
+      );
+
+      final int notificationId = await _repository.addNotification(notificationData);
+
+      final String bodyText = (event.description != null && event.description!.isNotEmpty)
+        ? event.description!
+        : "Tienes una tarea pendiente.";
+
+      await NotificationService().scheduleNotification(
+        id: notificationId, 
+        title: event.title, 
+        body: bodyText,
+        scheduledDate: alertDate
+      );
+
+    }
+
+  }
+
+
+
+  Future<void> _deleteSecheduleNotification(int taskId) async {
+    final notificationsId = await _repository.getNotifications(taskId);
+
+    for(final notification in notificationsId){
+      await NotificationService().cancelNotification(notification.id);
+    }
+
+    await _repository.deleteNotifications(taskId);
+  }
 
 
 }
