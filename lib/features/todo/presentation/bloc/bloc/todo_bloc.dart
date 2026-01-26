@@ -31,7 +31,7 @@ class TodoBloc extends Bloc<TodoEvent, TodoState> {
     emit(TodoLoading());
 
     await emit.forEach<List<EventEntity>>(
-      _repository.getEvents(), 
+      _repository.getEvents(isDone: event.isDone), 
       onData: (tasks) => TodoLoaded(tasks),
       onError: (error, stackTrace) => TodoError(error.toString()),
     );
@@ -81,7 +81,11 @@ class TodoBloc extends Bloc<TodoEvent, TodoState> {
 
       await _deleteSecheduleNotification(event.event.id!);
       await _repository.updateEvent(event.event);  
-      await _scheduleNotifications(event.event.id!, event.event);
+      
+      
+      if (!event.event.isDone){
+        await _scheduleNotifications(event.event.id!, event.event);
+      }
 
     } catch (e) {
       emit(TodoError("Error al actualizar la tarea: $e"));

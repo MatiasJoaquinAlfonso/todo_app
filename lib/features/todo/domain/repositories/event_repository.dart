@@ -5,7 +5,7 @@ abstract class EventRepository {
 
   Future<EventEntity?> getEventsById(int id);
 
-  Stream<List<EventEntity>> getEvents();
+  Stream<List<EventEntity>> getEvents({bool isDone = false});
 
   Future<int> saveEvent(EventEntity event);
 

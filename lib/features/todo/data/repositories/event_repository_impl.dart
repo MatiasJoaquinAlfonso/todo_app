@@ -12,10 +12,17 @@ class EventRepositoryImpl extends EventRepository {
   EventRepositoryImpl({required this.db});
 
   @override
-  Stream<List<EventEntity>> getEvents() {
-    return db.watchAllEvents().map((driftList){
-      return driftList.map((item) => item.toEntity()).toList();
-    });
+  Stream<List<EventEntity>> getEvents({bool isDone = false}) {
+
+    final query = db.select(db.events)..where((tbl) => tbl.isDone.equals(isDone));
+    return query.watch().map((driftList) {
+      return driftList.map((e) => e.toEntity()).toList();
+    },);
+
+    // return db.watchAllEvents().map((driftList){
+    //   return driftList.map((item) => item.toEntity()).toList();
+    // });
+
   }
 
   @override

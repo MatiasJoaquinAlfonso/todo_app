@@ -5,7 +5,7 @@ import 'package:todo_app/config/theme/app_theme.dart';
 import 'package:todo_app/features/database/database.dart';
 import 'package:todo_app/features/todo/data/repositories/event_repository_impl.dart';
 import 'package:todo_app/features/todo/domain/repositories/event_repository.dart';
-import 'package:todo_app/features/todo/presentation/bloc/bloc/todo_bloc.dart';
+// import 'package:todo_app/features/todo/presentation/bloc/bloc/todo_bloc.dart';
 import 'package:todo_app/features/shared/services/notification_service.dart';
 
 
@@ -33,20 +33,41 @@ class MyApp extends StatelessWidget {
     
     return RepositoryProvider<EventRepository>(
       create: (context) => EventRepositoryImpl(db: db),
-      child: BlocProvider(
-        create: (context) {
-          final repository = context.read<EventRepository>();
-          return TodoBloc(repository: repository)
-            ..add(TodoSubscriptionRequested());
-        },
-        child: MaterialApp.router(
+      child: MaterialApp.router(
           debugShowCheckedModeBanner: false,
           title: 'To-Do App',
           theme: AppTheme(isDarkMode: true, selectedColor: 0).getTheme(),
           routerConfig: appRouter,
-          // home: HomePage(),
         ),
-      ),
     );
   }
 }
+
+
+// class MyApp extends StatelessWidget {
+//   final AppDatabase db;
+
+//   const MyApp({super.key, required this.db});
+
+//   @override
+//   Widget build(BuildContext context) {
+    
+//     return RepositoryProvider<EventRepository>(
+//       create: (context) => EventRepositoryImpl(db: db),
+//       child: BlocProvider(
+//         create: (context) {
+//           final repository = context.read<EventRepository>();
+//           return TodoBloc(repository: repository)
+//             ..add(TodoSubscriptionRequested());
+//         },
+//         child: MaterialApp.router(
+//           debugShowCheckedModeBanner: false,
+//           title: 'To-Do App',
+//           theme: AppTheme(isDarkMode: true, selectedColor: 0).getTheme(),
+//           routerConfig: appRouter,
+//           // home: HomePage(),
+//         ),
+//       ),
+//     );
+//   }
+// }

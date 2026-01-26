@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:todo_app/features/shared/services/notification_service.dart';
 import 'package:todo_app/features/shared/widgets/widgets.dart';
-// import 'package:todo_app/features/todo/domain/entities/event_entity.dart';
 import 'package:todo_app/features/todo/presentation/bloc/bloc/todo_bloc.dart';
 
 class HomePage extends StatelessWidget {
@@ -79,13 +79,35 @@ class HomePage extends StatelessWidget {
                 final task = state.events[index];
                 return Dismissible(
                   key: Key(task.id.toString()),
-                  direction: DismissDirection.endToStart,
+                  // direction: DismissDirection.endToStart,
                   
-                  onDismissed: (direction) {
-                    context.read<TodoBloc>().add(TodoDeleted(task));
-                  },
-            
+                  // Completado
                   background: Container(
+                    margin: const EdgeInsets.symmetric(vertical: 4),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(15),
+                      gradient: LinearGradient(
+                        begin: Alignment.centerRight,
+                        end: Alignment.centerLeft,
+                        colors: [
+                          const Color.fromARGB(36, 124, 207, 97),
+                          Colors.green.shade700,
+                        ],
+                        stops: const [0.4, 1.0],
+            
+                      ),
+                    ),
+                    alignment: Alignment.centerLeft,
+                    padding: const EdgeInsets.only(left: 25.0),
+                    child: const Icon(
+                      Icons.check_circle_outline_rounded,
+                      color: Colors.white,
+                      size: 30,
+                    ),
+                  ),
+
+                  //Borrado 
+                  secondaryBackground: Container(
                     margin: const EdgeInsets.symmetric(vertical: 4),
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(15),
@@ -108,11 +130,38 @@ class HomePage extends StatelessWidget {
                       size: 30,
                     ),
                   ),
+
+                  confirmDismiss: (direction) async {
+                    
+                    logger.d(task);
+
+                    if(direction == DismissDirection.startToEnd) {
+                      final completedTask = task.copyWith(isDone: true);
+                      
+                      context.read<TodoBloc>().add(TodoUpdated(completedTask));
+                      logger.d(task);
+                      // ScaffoldMessenger.of(context).showSnackBar(
+                      //   const SnackBar(
+                      //     content: Text("¡Tarea completada! 🎉"), 
+                      //     duration: Duration(seconds: 1)
+                      //   )
+                      // );
+
+                    } else {
+                      context.read<TodoBloc>().add(TodoDeleted(task));
+                    }
+
+                    return false;
+                  },
             
                   child: TaskCard(
                     title: task.title, 
                     subTitle: task.subTitle ?? '',
-                    longDescription: task.description ?? '', 
+                    // longDescription: task.dateInit.toString() + ' - ' + task.dateFinish.toString() ?? '' , 
+                    longDescription: 
+                      '${task.dateInit.day}/${task.dateInit.month} - ' // Día/Mes
+                      '${task.dateInit.hour}:${task.dateInit.minute.toString().padLeft(2, '0')} - ' // Hora inicio
+                      '${task.dateFinish.hour}:${task.dateFinish.minute.toString().padLeft(2, '0')}', // Hora fin
                     borderRadius: 15,
                     onTap: () => context.push('/task-screen', extra: task),
                   ),
@@ -130,23 +179,8 @@ class HomePage extends StatelessWidget {
             CircularProgressIndicator(),
 
           ],);
-          // return Container(child: Text('Iniciando...'),);
         },
       ),
-
-      // floatingActionButton: FloatingActionButton(
-      //   child: const Icon(Icons.add),
-      //   onPressed: () {
-      //     final newTask = EventEntity(
-      //       title: 'Tarea de Prueba ${DateTime.now().second}',
-      //       description: 'Creada automáticamente',
-      //       dateInit: DateTime.now(),
-      //       isAllDay: false,
-      //     );
-          
-      //     context.read<TodoBloc>().add(TodoAdded(newTask));
-      //   },
-      // ),
 
     );
   }

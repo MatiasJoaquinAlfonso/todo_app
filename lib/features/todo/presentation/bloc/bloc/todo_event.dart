@@ -7,7 +7,14 @@ sealed class TodoEvent extends Equatable {
   List<Object> get props => [];
 }
 
-final class TodoSubscriptionRequested extends TodoEvent {}
+final class TodoSubscriptionRequested extends TodoEvent {
+  final bool isDone;
+
+  const TodoSubscriptionRequested({this.isDone = false});
+
+  @override
+  List<Object> get props => [isDone];
+}
 
 final class TodoAdded extends TodoEvent {
   final EventEntity event;
