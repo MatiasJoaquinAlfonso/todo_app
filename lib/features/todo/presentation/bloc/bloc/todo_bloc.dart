@@ -113,25 +113,26 @@ class TodoBloc extends Bloc<TodoEvent, TodoState> {
           event.dateInit.minute,
         );
       }
-
-      final notificationData = NotificationTableCompanion(
-        eventId: Value(taskId),
-        scheduleDate: Value(alertDate),
-      );
-
-      final int notificationId = await _repository.addNotification(notificationData);
-
-      final String bodyText = (event.description != null && event.description!.isNotEmpty)
-        ? event.description!
-        : "Tienes una tarea pendiente.";
-
-      await NotificationService().scheduleNotification(
-        id: notificationId, 
-        title: event.title, 
-        body: bodyText,
-        scheduledDate: alertDate
-      );
-
+      
+      if (!alertDate.isBefore(DateTime.now())) {
+        final notificationData = NotificationTableCompanion(
+          eventId: Value(taskId),
+          scheduleDate: Value(alertDate),
+        );
+  
+        final int notificationId = await _repository.addNotification(notificationData);
+  
+        final String bodyText = (event.description != null && event.description!.isNotEmpty)
+          ? event.description!
+          : "Tienes una tarea pendiente.";
+  
+        await NotificationService().scheduleNotification(
+          id: notificationId, 
+          title: event.title, 
+          body: bodyText,
+          scheduledDate: alertDate
+        );
+      }
     }
 
   }
