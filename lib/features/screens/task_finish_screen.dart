@@ -24,15 +24,17 @@ class TaskFinishScreen extends StatelessWidget {
 
           if (state is TodoLoaded) {
             if(state.events.isEmpty){
-              return Column(
-                children: [
-                  Padding(
-                    padding: EdgeInsetsGeometry.symmetric(horizontal: 10, vertical: 10),
-                    child: Text("No hay tareas completadas!"),
-                  )
-                ],
+              return SafeArea(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Center(
+                      child: Text("No hay tareas completadas!"),
+                    )
+                  ],
+                ),
               );
-            }else{
+            } else {
               return SafeArea(
                 child: ListView.builder(
                 padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
@@ -50,20 +52,19 @@ class TaskFinishScreen extends StatelessWidget {
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(15),
                         gradient: LinearGradient(
-                          begin: Alignment.centerRight,
-                          end: Alignment.centerLeft,
+                          begin: Alignment.centerLeft,
+                          end: Alignment.centerRight,
                           colors: [
-                            const Color.fromARGB(36, 124, 207, 97),
-                            Colors.green.shade700,
+                            const Color.fromARGB(37, 244, 67, 54),
+                            Colors.redAccent.shade700,
                           ],
-                          stops: const [0.4, 1.0],
-                            
+                          stops: const [0.4, 1.0],  
                         ),
                       ),
                       alignment: Alignment.centerLeft,
                       padding: const EdgeInsets.only(left: 25.0),
                       child: const Icon(
-                        Icons.check_circle_outline_rounded,
+                        Icons.delete_outline_rounded,
                         color: Colors.white,
                         size: 30,
                       ),
@@ -75,11 +76,11 @@ class TaskFinishScreen extends StatelessWidget {
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(15),
                         gradient: LinearGradient(
-                          begin: Alignment.centerLeft,
-                          end: Alignment.centerRight,
+                          begin: Alignment.centerRight,
+                          end: Alignment.centerLeft,
                           colors: [
-                            const Color.fromARGB(37, 244, 67, 54),
-                            Colors.redAccent.shade700,
+                            const Color.fromARGB(36, 124, 207, 97),
+                            Colors.green.shade700,
                           ],
                           stops: const [0.4, 1.0],
                             
@@ -88,7 +89,7 @@ class TaskFinishScreen extends StatelessWidget {
                       alignment: Alignment.centerRight,
                       padding: const EdgeInsets.only(right: 25.0),
                       child: const Icon(
-                        Icons.delete_outline_rounded,
+                        Icons.restore_from_trash_sharp,
                         color: Colors.white,
                         size: 30,
                       ),
@@ -97,18 +98,13 @@ class TaskFinishScreen extends StatelessWidget {
                     confirmDismiss: (direction) async {
                 
                       if(direction == DismissDirection.startToEnd) {
-                        final completedTask = task.copyWith(isDone: true);
+                        context.read<TodoBloc>().add(TodoDeleted(task));
+                      
+                      } else {
+                        final completedTask = task.copyWith(isDone: false);
                         
                         context.read<TodoBloc>().add(TodoUpdated(completedTask));
-                        // ScaffoldMessenger.of(context).showSnackBar(
-                        //   const SnackBar(
-                        //     content: Text("¡Tarea completada! 🎉"), 
-                        //     duration: Duration(seconds: 1)
-                        //   )
-                        // );
-                
-                      } else {
-                        context.read<TodoBloc>().add(TodoDeleted(task));
+
                       }
                 
                       return false;
