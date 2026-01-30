@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:todo_app/features/shared/services/notification_service.dart';
 import 'package:todo_app/features/shared/widgets/widgets.dart';
 import 'package:todo_app/features/todo/presentation/bloc/todo_bloc.dart';
+import 'package:todo_app/features/todo/presentation/cubit/cubit/theme_cubit.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -18,8 +19,14 @@ class HomePage extends StatelessWidget {
         actionsPadding: EdgeInsets.symmetric(horizontal: 10),
         actions: [
           IconButton(
-            onPressed: () {},
-            icon: Icon(Icons.dark_mode_outlined),
+            icon: Icon(
+              context.watch<ThemeCubit>().state.themeMode == ThemeMode.dark
+                ? Icons.light_mode_outlined
+                : Icons.dark_mode_outlined
+            ),
+            onPressed: () {
+              context.read<ThemeCubit>().toggleTheme();
+            },
           )
         ],
       ),

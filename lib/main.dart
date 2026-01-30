@@ -7,12 +7,11 @@ import 'package:todo_app/features/todo/data/repositories/event_repository_impl.d
 import 'package:todo_app/features/todo/domain/repositories/event_repository.dart';
 // import 'package:todo_app/features/todo/presentation/bloc/bloc/todo_bloc.dart';
 import 'package:todo_app/features/shared/services/notification_service.dart';
-
+import 'package:todo_app/features/todo/presentation/cubit/cubit/theme_cubit.dart';
 
 void main() async {
-
   WidgetsFlutterBinding.ensureInitialized();
-  
+
   final NotificationService notificationService = NotificationService();
   await notificationService.init();
   //Apenas iniciamos la app solicitamos los permisos.
@@ -30,15 +29,24 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    
     return RepositoryProvider<EventRepository>(
       create: (context) => EventRepositoryImpl(db: db),
-      child: MaterialApp.router(
-          debugShowCheckedModeBanner: false,
-          title: 'To-Do App',
-          theme: AppTheme(isDarkMode: true, selectedColor: 0).getTheme(),
-          routerConfig: appRouter,
+      child: BlocProvider(
+        create: (context) => ThemeCubit(),
+        child: BlocBuilder<ThemeCubit, ThemeState>(
+          builder: (context, state) {
+
+            return MaterialApp.router(
+              debugShowCheckedModeBanner: false,
+              title: 'To-Do App',
+              routerConfig: appRouter,
+              theme: AppTheme(isDarkMode: false, selectedColor: 0).getTheme(),
+              darkTheme: AppTheme(isDarkMode: true, selectedColor: 0).getTheme(),
+              themeMode: state.themeMode,
+            );
+          },
         ),
+      ),
     );
   }
 }
