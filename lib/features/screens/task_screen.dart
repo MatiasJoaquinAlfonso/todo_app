@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:todo_app/features/todo/domain/entities/event_entity.dart';
-import 'package:todo_app/features/todo/presentation/bloc/bloc/todo_bloc.dart';
+import 'package:todo_app/features/todo/presentation/bloc/todo_bloc.dart';
 import '../shared/widgets/widgets.dart';
 
 class TaskScreen extends StatefulWidget {

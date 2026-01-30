@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:todo_app/features/shared/services/notification_service.dart';
 import 'package:todo_app/features/shared/widgets/widgets.dart';
-import 'package:todo_app/features/todo/presentation/bloc/bloc/todo_bloc.dart';
+import 'package:todo_app/features/todo/presentation/bloc/todo_bloc.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});

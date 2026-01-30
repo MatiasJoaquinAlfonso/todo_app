@@ -4,7 +4,7 @@ import 'package:todo_app/features/screens/screens.dart';
 import 'package:todo_app/features/shared/widgets/widgets.dart';
 import 'package:todo_app/features/todo/domain/entities/event_entity.dart';
 import 'package:todo_app/features/todo/domain/repositories/event_repository.dart';
-import 'package:todo_app/features/todo/presentation/bloc/bloc/todo_bloc.dart';
+import 'package:todo_app/features/todo/presentation/bloc/todo_bloc.dart';
 
 
 
