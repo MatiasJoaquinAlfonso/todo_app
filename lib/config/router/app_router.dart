@@ -1,5 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:todo_app/features/screens/categories_screen.dart';
 import 'package:todo_app/features/screens/screens.dart';
 import 'package:todo_app/features/shared/widgets/widgets.dart';
 import 'package:todo_app/features/todo/domain/entities/event_entity.dart';
@@ -53,6 +54,15 @@ final appRouter = GoRouter(
             ),
           ]
         ),
+
+        StatefulShellBranch(
+          routes: [
+            GoRoute(
+              path: '/categories',
+              builder: (context, state) => CategoriesScreen(),
+            ),
+          ]
+        ),      
 
         StatefulShellBranch(
           routes: [

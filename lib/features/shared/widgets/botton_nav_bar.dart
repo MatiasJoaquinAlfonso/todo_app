@@ -61,6 +61,12 @@ class BottomNavBar extends StatelessWidget {
               ),
 
               BottomNavigationBarItem(
+                icon: Icon(Icons.category_rounded),
+                // activeIcon: Icon(Icons.check_rounded),
+                label: 'Cateogorias'
+              ),
+
+              BottomNavigationBarItem(
                 icon: Icon(Icons.settings_rounded),
                 // activeIcon: Icon(Icons.check_rounded),
                 label: 'Configuración'

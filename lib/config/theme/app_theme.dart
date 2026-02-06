@@ -10,6 +10,8 @@ class AppTheme {
 
   final int selectedColor;
   final bool isDarkMode;
+  // final Color background =  Color(0x00f2f4f7);
+
 
   AppTheme({
     this.isDarkMode = false,
@@ -27,11 +29,8 @@ class AppTheme {
       useMaterial3: true,
       colorScheme: colorScheme,
 
-      // scaffoldBackgroundColor: isDarkMode ? null : Colors.white60,
-
       appBarTheme: AppBarTheme(
         centerTitle: true,
-        // backgroundColor: isDarkMode? null : Colors.white,
         elevation: 0,
         iconTheme: IconThemeData(color: colorScheme.primary),
         titleTextStyle: TextStyle(
@@ -42,14 +41,19 @@ class AppTheme {
       ),
 
       cardTheme: CardThemeData(
-        color: isDarkMode ? null : Colors.white30,
+        color: isDarkMode ? null : Colors.white,
         elevation: 2, 
-        shadowColor: Colors.black12, 
+        shadowColor: Colors.black87, 
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
       ),
 
       textTheme: TextTheme(
         titleLarge: TextStyle(fontWeight: FontWeight.bold),
+        
+      ),
+
+      iconTheme: IconThemeData(
+        // color: isDarkMode ? Colors.white : Colors.black
       )
 
     );

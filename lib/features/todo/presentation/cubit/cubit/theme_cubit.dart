@@ -6,7 +6,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 part 'theme_state.dart';
 
 class ThemeCubit extends Cubit<ThemeState> {
-  ThemeCubit() : super(const ThemeState(themeMode: ThemeMode.system));
+  ThemeCubit() : super(const ThemeState(themeMode: ThemeMode.system)) {
+    _loadTheme();
+  }
 
   static const String _themePrefsKey = 'theme_mode_index';
 

@@ -54,13 +54,14 @@ class HomePage extends StatelessWidget {
                     ),
                   ),
               
-                  Icon(Icons.check_rounded, size: 80, color: Colors.white),
+                  Icon(Icons.check_rounded, size: 80, color: Theme.of(context).colorScheme.onSurfaceVariant),
                   const SizedBox(height: 16),
                   Text(
                     'No hay tareas para mostrar.',
                     style: TextStyle(
                       fontSize: 18,
-                      color: Colors.white
+                      color: Theme.of(context).colorScheme.onSurface
+                      // color: Colors.white
                     ),
                   ),
                   
@@ -163,15 +164,23 @@ class HomePage extends StatelessWidget {
             
                   child: TaskCard(
                     title: task.title, 
-                    subTitle: task.subTitle ?? '',
-                    // longDescription: task.dateInit.toString() + ' - ' + task.dateFinish.toString() ?? '' , 
+                    subTitle: task.description ?? '',
                     longDescription: 
-                      '${task.dateInit.day}/${task.dateInit.month} - ' // Día/Mes
-                      '${task.dateInit.hour}:${task.dateInit.minute.toString().padLeft(2, '0')} - ' // Hora inicio
-                      '${task.dateFinish.hour}:${task.dateFinish.minute.toString().padLeft(2, '0')}', // Hora fin
+                      'Inicio: ${task.dateInit.day}/${task.dateInit.month} - ${task.dateInit.hour}:${task.dateInit.minute.toString().padLeft(2, '0')}\n' // Día/Mes
+                      'Fin: ${task.dateFinish.day}/${task.dateFinish.month} - ${task.dateFinish.hour}:${task.dateFinish.minute.toString().padLeft(2, '0')}', // Día/Mes
                     borderRadius: 15,
                     onTap: () => context.push('/task-screen', extra: task),
                   ),
+                  
+                  // child: TaskCard(
+                  //   title: task.title, 
+                  //   subTitle:     
+                  //     'Inicio: ${task.dateInit.day}/${task.dateInit.month} - ${task.dateInit.hour}:${task.dateInit.minute.toString().padLeft(2, '0')}\t\t\t' // Día/Mes
+                  //     'Fin: ${task.dateFinish.day}/${task.dateFinish.month} - ${task.dateFinish.hour}:${task.dateFinish.minute.toString().padLeft(2, '0')}', // Día/Mes,
+                  //   longDescription: task.description ?? '',
+                  //   borderRadius: 15,
+                  //   onTap: () => context.push('/task-screen', extra: task),
+                  // ),
                 );
               },
             
