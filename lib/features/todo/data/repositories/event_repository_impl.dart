@@ -1,3 +1,4 @@
+import 'package:drift/drift.dart';
 import 'package:todo_app/features/database/database.dart';
 import 'package:todo_app/features/todo/domain/entities/event_entity.dart';
 import 'package:todo_app/features/todo/domain/repositories/event_repository.dart';
@@ -65,6 +66,12 @@ class EventRepositoryImpl extends EventRepository {
   Future<void> deleteNotifications(int taskId) async {
     await (db.delete(db.notificationTable)..where((tbl) => tbl.eventId.equals(taskId))).go();
   }
+
+  @override
+  Future<int> countTaskByCategoryId(int categoryId) async {
+    final tasks = await db.getEventsByCategoryId(categoryId);
+    return tasks.length;
+  } 
 
 }
 

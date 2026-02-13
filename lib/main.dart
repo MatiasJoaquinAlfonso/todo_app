@@ -7,7 +7,7 @@ import 'package:todo_app/features/todo/data/repositories/event_repository_impl.d
 import 'package:todo_app/features/todo/domain/repositories/event_repository.dart';
 // import 'package:todo_app/features/todo/presentation/bloc/bloc/todo_bloc.dart';
 import 'package:todo_app/features/shared/services/notification_service.dart';
-import 'package:todo_app/features/todo/presentation/cubit/cubit/theme_cubit.dart';
+import 'package:todo_app/features/todo/presentation/cubit/theme_cubit/theme_cubit.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

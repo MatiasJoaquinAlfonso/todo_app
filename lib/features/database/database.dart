@@ -29,31 +29,28 @@ class AppDatabase extends _$AppDatabase {
     onCreate: (m) async {
       await m.createAll();
 
-      final count = await categoriesTable.count().getSingle();
+      await batch((batch) {
+          batch.insertAll(categoriesTable, [
+            CategoriesTableCompanion.insert(
+              title: 'Trabajo',
+              color: 0xFFF44336,
+              priority: Value(1),
+            ),
+            CategoriesTableCompanion.insert(
+              title: 'Estudio',
+              color: 0xFF2196F3,
+              priority: Value(2),
+            ),
+            CategoriesTableCompanion.insert(
+              title: 'Hobby',
+              color: 0xFF4CAF50,
+              priority: Value(3),
+            )
+          ]);
+        },
+      );
 
-      if (count == 0){
-        await batch((batch) {
-            batch.insertAll(categoriesTable, [
-              CategoriesTableCompanion.insert(
-                title: 'Trabajo',
-                color: 0xFFF44336,
-                priority: Value(1),
-              ),
-              CategoriesTableCompanion.insert(
-                title: 'Estudio',
-                color: 0xFF2196F3,
-                priority: Value(2),
-              ),
-              CategoriesTableCompanion.insert(
-                title: 'Hobby',
-                color: 0xFF4CAF50,
-                priority: Value(3),
-              )
-            ]);
-          },
-        );
-
-      }
+      
 
     },
 
@@ -65,6 +62,9 @@ class AppDatabase extends _$AppDatabase {
       }
 
       if (from < 3) {
+
+
+        
         await m.createTable(categoriesTable);
 
         await m.addColumn(events, events.fkCategoryID);
@@ -135,6 +135,10 @@ class AppDatabase extends _$AppDatabase {
 
   Future<bool> updateCategory(CategoriesTableCompanion category) {
     return update(categoriesTable).replace(category);
+  }
+
+  Future<List<Event>> getEventsByCategoryId(int categoryId) {
+    return (select(events)..where((tbl) => tbl.fkCategoryID.equals(categoryId))).get();
   }
 
 }

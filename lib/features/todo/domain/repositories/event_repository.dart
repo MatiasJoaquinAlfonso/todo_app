@@ -18,4 +18,6 @@ abstract class EventRepository {
   Future<List<NotificationTableData>> getNotifications(int taskId);
 
   Future<void> deleteNotifications(int taskId);
+
+  Future<int> countTaskByCategoryId(int categoryId);
 }

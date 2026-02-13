@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:todo_app/features/shared/services/notification_service.dart';
 import 'package:todo_app/features/shared/widgets/widgets.dart';
 import 'package:todo_app/features/todo/presentation/bloc/todo_bloc.dart';
-import 'package:todo_app/features/todo/presentation/cubit/cubit/theme_cubit.dart';
+import 'package:todo_app/features/todo/presentation/cubit/theme_cubit/theme_cubit.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
