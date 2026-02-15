@@ -16,6 +16,12 @@ final class CreateCategory extends CategoryEvent {
   const CreateCategory(this.category);
 }
 
+final class UpdateCategory extends CategoryEvent {
+  final CategoryEntity category;
+
+  const UpdateCategory(this.category);
+}
+
 final class RequestDeleteCategory extends CategoryEvent {
   final CategoryEntity category;
 
@@ -26,9 +32,9 @@ final class ConfirmDeleteCategory extends CategoryEvent {
   final CategoryEntity category;
   final bool deleteTasks;
 
-  const ConfirmDeleteCategory({
+  const ConfirmDeleteCategory(
+    this.deleteTasks, {
     required this.category, 
-    required this.deleteTasks
   });
 }
 

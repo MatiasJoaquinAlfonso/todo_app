@@ -35,3 +35,10 @@ final class CategoryError extends CategoryState {
   final String message;
   const CategoryError(this.message);
 }
+
+final class CategoryOperationSuccess extends CategoryState {
+  final int deletedCount;
+
+  const CategoryOperationSuccess({required this.deletedCount});
+
+}

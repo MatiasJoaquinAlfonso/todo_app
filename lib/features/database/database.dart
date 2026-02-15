@@ -116,6 +116,15 @@ class AppDatabase extends _$AppDatabase {
     return update(events).replace(event);
   }
 
+  Future<int> deleteEventByCategoryId(int categoryId) {
+    return (delete(events)..where((tbl) => tbl.fkCategoryID.equals(categoryId))).go();
+  }
+
+  Future<void> updateEventByCategoryId(int oldCategoryId, int? newCategoryId) {
+    return (update(events)..where((tbl) => tbl.fkCategoryID.equals(oldCategoryId)))
+      .write(EventsCompanion(fkCategoryID: Value(newCategoryId)));
+  }
+
   // Categorias 
   Future<List<CategoriesTableData>> getAllCategories(){
     return select(categoriesTable).get();
