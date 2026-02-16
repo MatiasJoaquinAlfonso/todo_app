@@ -9,10 +9,10 @@ class CategoryEntity extends Equatable{
   final int priority;
 
   const CategoryEntity({
-    required this.id, 
+    this.id, 
     required this.title,
     required this.color, 
-    required this.priority
+    required this.priority,
   });
 
   CategoryEntity copyWith({
