@@ -4,7 +4,9 @@ import 'package:todo_app/features/screens/categories_screen.dart';
 import 'package:todo_app/features/screens/screens.dart';
 import 'package:todo_app/features/shared/widgets/widgets.dart';
 import 'package:todo_app/features/todo/domain/entities/event_entity.dart';
+import 'package:todo_app/features/todo/domain/repositories/category_repository.dart';
 import 'package:todo_app/features/todo/domain/repositories/event_repository.dart';
+import 'package:todo_app/features/todo/presentation/bloc/categories_bloc/bloc/category_bloc.dart';
 import 'package:todo_app/features/todo/presentation/bloc/todo_bloc.dart';
 
 
@@ -59,7 +61,18 @@ final appRouter = GoRouter(
           routes: [
             GoRoute(
               path: '/categories',
-              builder: (context, state) => CategoriesScreen(),
+              builder: (context, state) {
+                final eventRepository = context.read<EventRepository>();
+                final categoryRepository = context.read<CategoryRepository>();
+
+                return BlocProvider(
+                  create: (context) => CategoryBloc(
+                    eventRepository: eventRepository, 
+                    categoryRepository: categoryRepository
+                  )..add(SubscribeToCategories()),
+                  child: const CategoriesScreen(),
+                );
+              },
             ),
           ]
         ),      

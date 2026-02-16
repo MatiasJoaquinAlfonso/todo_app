@@ -12,6 +12,10 @@ class DialogUtils {
     String? cancelText,
     VoidCallback? onConfirm,
     bool isError = false,
+
+    String? otherActionText,
+    VoidCallback? onOtherAction,
+
   }) {
     showDialog(
       context: context, 
@@ -24,6 +28,15 @@ class DialogUtils {
             TextButton(
               onPressed: () => context.pop(), 
               child: Text(cancelText, style: TextStyle(color: Colors.blue)),
+            ),
+
+          if (otherActionText != null)
+            TextButton(
+              onPressed: () {
+                context.pop();
+                if(onOtherAction != null) onOtherAction();
+              },
+              child: Text(otherActionText, style: TextStyle(color: Colors.amber)),
             ),
 
           TextButton(
