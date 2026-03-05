@@ -34,17 +34,17 @@ class AppDatabase extends _$AppDatabase {
             CategoriesTableCompanion.insert(
               title: 'Trabajo',
               color: 0xFFF44336,
-              priority: Value(1),
+              priority: Value(0),
             ),
             CategoriesTableCompanion.insert(
               title: 'Estudio',
               color: 0xFF2196F3,
-              priority: Value(2),
+              priority: Value(0),
             ),
             CategoriesTableCompanion.insert(
               title: 'Hobby',
               color: 0xFF4CAF50,
-              priority: Value(3),
+              priority: Value(0),
             )
           ]);
         },

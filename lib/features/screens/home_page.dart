@@ -148,12 +148,12 @@ class HomePage extends StatelessWidget {
                       
                       context.read<TodoBloc>().add(TodoUpdated(completedTask));
                       logger.d(task);
-                      // ScaffoldMessenger.of(context).showSnackBar(
-                      //   const SnackBar(
-                      //     content: Text("¡Tarea completada! 🎉"), 
-                      //     duration: Duration(seconds: 1)
-                      //   )
-                      // );
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text("¡Tarea completada! 🎉"), 
+                          duration: Duration(seconds: 1)
+                        )
+                      );
 
                     } else {
                       context.read<TodoBloc>().add(TodoDeleted(task));
@@ -172,15 +172,6 @@ class HomePage extends StatelessWidget {
                     onTap: () => context.push('/task-screen', extra: task),
                   ),
                   
-                  // child: TaskCard(
-                  //   title: task.title, 
-                  //   subTitle:     
-                  //     'Inicio: ${task.dateInit.day}/${task.dateInit.month} - ${task.dateInit.hour}:${task.dateInit.minute.toString().padLeft(2, '0')}\t\t\t' // Día/Mes
-                  //     'Fin: ${task.dateFinish.day}/${task.dateFinish.month} - ${task.dateFinish.hour}:${task.dateFinish.minute.toString().padLeft(2, '0')}', // Día/Mes,
-                  //   longDescription: task.description ?? '',
-                  //   borderRadius: 15,
-                  //   onTap: () => context.push('/task-screen', extra: task),
-                  // ),
                 );
               },
             

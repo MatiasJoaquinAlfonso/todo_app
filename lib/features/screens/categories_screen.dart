@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:todo_app/features/todo/domain/entities/category_entity.dart';
+import 'package:todo_app/features/shared/services/notification_service.dart';
 import 'package:todo_app/features/todo/presentation/bloc/categories_bloc/bloc/category_bloc.dart';
 
 import '../shared/widgets/widgets.dart';
@@ -117,55 +117,60 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                     itemCount: state.categories.length + 1,
                     itemBuilder: (context, index) {
                       if (index == state.categories.length) {
-                        // TODO: Crear widget para agregar categoria. Como ultimo ITEM
-                        // return ListTile(
-                        //   leading: const Icon(Icons.add, color: Colors.blue),
-                        //   title: const Text(
-                        //     'Crear nueva categoría',
-                        //     style: TextStyle(color: Colors.grey),
-                        //   ),
-                        //   onTap: () => showModalBottomSheet(
-                        //     context: context,
-                        //     builder: (c) => Container(
-                        //       height: 200,
-                        //       color: Colors.white,
-                        //       child: Center(child: Text("Formulario")),
-                        //     ),
-                        //   ),
+                        return CategoryTile(
+                          category: null, 
+                          onSave: (String title, int color, int priority) { 
+                            logger.d('Guardando... ');
+                          },
+                        );
+
+                        // return CategoryTileV2(
+                        //   category: null, // Null indica "Nueva Categoría"
+                        //   onSave: (title, color, priority) {
+                        //     final newCategory = CategoryEntity(
+                        //       title: title, 
+                        //       color: color, 
+                        //       priority: priority,
+                        //       // id es null
+                        //     );
+                        //     context.read<CategoryBloc>().add(CreateCategory(newCategory));
+                        //   },
+                        //   // No pasamos onDelete porque no se puede borrar lo que no existe
                         // );
 
-                        return CategoryTile(
-                          onCreate: (title, color, priority) {
-                            final newCategory = CategoryEntity(
-                              title: title, 
-                              color: color, 
-                              priority: priority,
-                            );
 
-                            context.read<CategoryBloc>().add(CreateCategory(newCategory));
-                          }, 
-                          textColor: Theme.of(context).colorScheme.onSurface, 
-                          hintColor: Theme.of(context).colorScheme.onSurface, 
-                          // backgroundColor: Theme.of(context).colorScheme.onSurface,
-                        );
+
                       }
 
                       final category = state.categories[index];
-                      return ListTile(
-                        leading: CircleAvatar(
-                          backgroundColor: Color(category.color),
-                          radius: 12,
-                        ),
-                        title: Text(category.title),
-                        trailing: IconButton(
-                          icon: const Icon(Icons.delete_outline),
-                          onPressed: () {
-                            context.read<CategoryBloc>().add(
-                              RequestDeleteCategory(category),
-                            );
-                          },
-                        ),
+                      return CategoryTile(
+                        category: category, 
+                        onSave: (String title, int color, int priority) { 
+                          logger.d('Guardando... ');
+                        },
                       );
+
+                      
+                      // return CategoryTileV2(
+                      //   category: category,
+                      //   // Se llama automáticamente al perder foco
+                      //   onSave: (title, color, priority) {
+                      //      final updatedCategory = CategoryEntity(
+                      //         id: category.id,
+                      //         title: title,
+                      //         color: color,
+                      //         priority: priority,
+                      //      );
+                      //      context.read<CategoryBloc>().add(UpdateCategory(updatedCategory));
+                      //   },
+                      //   // Botón de basura
+                      //   onDelete: () {
+                      //     context.read<CategoryBloc>().add(RequestDeleteCategory(category));
+                      //   },
+                      // );
+
+
+
                     },
                   ),
                 );
