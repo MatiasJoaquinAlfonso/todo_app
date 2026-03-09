@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:todo_app/features/shared/services/notification_service.dart';
+
 import 'package:todo_app/features/todo/domain/entities/category_entity.dart';
 
 class CategoryTile extends StatefulWidget {
@@ -37,27 +37,29 @@ class _CategoryTileState extends State<CategoryTile> {
 
     _focusNode.addListener(() {
       if (!_focusNode.hasFocus) {
-        logger.d('Perdi el foco');
-        final tituloActual = _controller.text.trim();
-
-        if (tituloActual.isEmpty || tituloActual == 'Nuevacategoria') {
-          if (_isNewCategory) {
-            _controller.text = 'Nueva categoria';
-          } else {
-            _controller.text = widget.category!.title;
-          }
-
-          setState(() {
-            _priority = widget.category?.priority ?? 0;
-            _selectedColor = widget.category?.color ?? 0xFF2196F3;
-          });
-
-          return;
-        }
-
-        widget.onSave(_controller.text, _selectedColor, _priority);
+        _trySave();
       }
     });
+  }
+
+  void _trySave() {
+    final tituloActual = _controller.text.trim();
+    final esVacioODefecto = tituloActual.isEmpty || tituloActual == 'Nueva categoria' || tituloActual == 'Nueva categoría....' || tituloActual == 'Nuevacategoria';
+
+    if (esVacioODefecto) {
+      if (_isNewCategory) {
+        _controller.text = '';
+      } else {
+        _controller.text = widget.category!.title;
+        setState(() {
+          _priority = widget.category?.priority ?? 0;
+          _selectedColor = widget.category?.color ?? 0xFF2196F3;
+        });
+      }
+      return;
+    }
+
+    widget.onSave(_controller.text.trim(), _selectedColor, _priority);
   }
 
   @override
@@ -95,112 +97,244 @@ class _CategoryTileState extends State<CategoryTile> {
 
   void _togglePriority() {
     setState(() => _priority = (_priority + 1) % 4);
+    _trySave();
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return TapRegion(
-      onTapOutside: (_) => _focusNode.unfocus(),
-      child: Container(
-        padding: EdgeInsetsGeometry.all(8),
-        margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16),
-          color: Color(_selectedColor).withAlpha(40),
-        ),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  TextField(
-                    controller: _controller,
-                    focusNode: _focusNode,
-                    style: TextStyle(
-                      color: theme.colorScheme.onSurface,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      decoration: TextDecoration.none,
-                    ),
-                    decoration: InputDecoration(
-                      hintText: 'Nueva categoría....',
-                      hintStyle: TextStyle(color: Colors.transparent),
-                      border: InputBorder.none,
-                      isDense: true,
-                    ),
-                  ),
-
-                  const SizedBox(height: 6),
-
-                  GestureDetector(
-                    onTap: _togglePriority,
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 200),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 4,
-                      ),
-                      decoration: BoxDecoration(
-                        color: theme.cardColor.withAlpha(200),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(Icons.flag, size: 14, color: _priorityColor),
-                          // Icon(Icons.flag, size: 14, color: Colors.amber),
-                          const SizedBox(width: 6),
-                          Text(
-                            _priorityText,
-                            style: TextStyle(
-                              fontSize: 12,
-                              // color: safeTextColor.withOpacity(0.8),
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-
-
-                ],
-              ),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: TapRegion(
+        onTapOutside: (_) => _focusNode.unfocus(),
+        child: _isNewCategory 
+          ? Container(
+            padding: EdgeInsetsGeometry.all(8),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(16),
+              color: Color(_selectedColor).withAlpha(40),
+              border: _isNewCategory 
+                ? Border.all(color: theme.hintColor.withAlpha(50), width: 2) 
+                : null,
             ),
-
-            GestureDetector(
-              onTap: () {
-                showDialog(
-                  context: context, 
-                  builder: (context) {
-                    return _SimpleColorPicker(
-                      initialColor: Color(_selectedColor),
-                      onSelectedColor: (Color nuevoColor) {
-                        setState(() {
-                          _selectedColor = nuevoColor.toARGB32();
-                        });
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      TextField(
+                        controller: _controller,
+                        focusNode: _focusNode,
+                        style: TextStyle(
+                          color: theme.colorScheme.onSurface,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          decoration: TextDecoration.none,
+                        ),
+                        decoration: InputDecoration(
+                          hintText: 'Nueva categoría....',
+                          hintStyle: TextStyle(color: Colors.transparent),
+                          border: InputBorder.none,
+                          isDense: true,
+                        ),
+                      ),
+      
+                      const SizedBox(height: 6),
+      
+                      GestureDetector(
+                        onTap: _togglePriority,
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 200),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 4,
+                          ),
+                          decoration: BoxDecoration(
+                            color: theme.cardColor.withAlpha(200),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(Icons.flag, size: 14, color: _priorityColor),
+                              const SizedBox(width: 6),
+                              Text(
+                                _priorityText,
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+      
+      
+                    ],
+                  ),
+                ),
+      
+                GestureDetector(
+                  onTap: () {
+                    showDialog(
+                      context: context, 
+                      builder: (context) {
+                        return _SimpleColorPicker(
+                          initialColor: Color(_selectedColor),
+                          onSelectedColor: (Color nuevoColor) {
+                            setState(() {
+                              _selectedColor = nuevoColor.toARGB32();
+                            });
+                            _trySave();
+                          },
+                        );
                       },
                     );
                   },
-                );
-              },
-              child: Container(
-                width: 24,
-                height: 24,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Color(_selectedColor),
-                  border: Border.all(color: Colors.white60, width: 2),
+                  child: Container(
+                    width: 24,
+                    height: 24,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Color(_selectedColor),
+                      border: Border.all(color: Colors.white60, width: 2),
+                    ),
+                  ),
+                )
+      
+              ],
+            ),
+          )
+      
+          : ClipRRect(
+            borderRadius: BorderRadius.circular(16),
+            child: Dismissible(
+                key: ValueKey(widget.category!.id), 
+                direction: DismissDirection.startToEnd,
+                background: Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.centerRight,
+                      end: Alignment.centerLeft,
+                      colors: [
+                        const Color.fromARGB(37, 244, 67, 54),
+                        Colors.redAccent.shade700,
+                      ],
+                      stops: const [0.4, 1.0],
+                    ),
+                  ),
+                  alignment: Alignment.centerLeft,
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: const Icon(Icons.delete, color: Colors.white,),
+                ),
+                onDismissed: (direction) {
+                  if (widget.onDelete != null) {
+                    widget.onDelete!();
+                  }
+                },
+                  
+                child: Container(
+                    padding: EdgeInsetsGeometry.all(8),
+                    decoration: BoxDecoration(
+                      color: Color(_selectedColor).withAlpha(40),
+                      border: _isNewCategory 
+                        ? Border.all(color: theme.hintColor.withAlpha(50), width: 2) 
+                        : null,
+                    ),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              TextField(
+                                controller: _controller,
+                                focusNode: _focusNode,
+                                style: TextStyle(
+                                  color: theme.colorScheme.onSurface,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                  decoration: TextDecoration.none,
+                                ),
+                                decoration: InputDecoration(
+                                  hintText: 'Nueva categoría....',
+                                  hintStyle: TextStyle(color: Colors.transparent),
+                                  border: InputBorder.none,
+                                  isDense: true,
+                                ),
+                              ),
+                  
+                              const SizedBox(height: 6),
+                  
+                              GestureDetector(
+                                onTap: _togglePriority,
+                                child: AnimatedContainer(
+                                  duration: const Duration(milliseconds: 200),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 8,
+                                    vertical: 4,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: theme.cardColor.withAlpha(200),
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(Icons.flag, size: 14, color: _priorityColor),
+                                      const SizedBox(width: 6),
+                                      Text(
+                                        _priorityText,
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                  
+                        GestureDetector(
+                          onTap: () {
+                            showDialog(
+                              context: context, 
+                              builder: (context) {
+                                return _SimpleColorPicker(
+                                  initialColor: Color(_selectedColor),
+                                  onSelectedColor: (Color nuevoColor) {
+                                    setState(() {
+                                      _selectedColor = nuevoColor.toARGB32();
+                                    });
+                                    _trySave();
+                                  },
+                                );
+                              },
+                            );
+                          },
+                          child: Container(
+                            width: 24,
+                            height: 24,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: Color(_selectedColor),
+                              border: Border.all(color: Colors.white60, width: 2),
+                            ),
+                          ),
+                        )
+                      ],
+                    ),
                 ),
               ),
-            )
-
-          ],
-        ),
+          ),
       ),
     );
   }

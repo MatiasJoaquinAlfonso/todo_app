@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:todo_app/features/shared/services/notification_service.dart';
+import 'package:todo_app/features/todo/domain/entities/category_entity.dart';
 import 'package:todo_app/features/todo/presentation/bloc/categories_bloc/bloc/category_bloc.dart';
 
 import '../shared/widgets/widgets.dart';
@@ -86,7 +87,6 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
 
               if (state is CategoryLoaded) {
                 if (state.categories.isEmpty) {
-                  // TODO: Cambiar esto cuando cree el widget para esto.
                   return Center(
                     child: TextButton.icon(
                       icon: Icon(Icons.add),
@@ -118,58 +118,31 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                     itemBuilder: (context, index) {
                       if (index == state.categories.length) {
                         return CategoryTile(
+                          key: const ValueKey('new_category'),
                           category: null, 
                           onSave: (String title, int color, int priority) { 
                             logger.d('Guardando... ');
+                            final newCategory = CategoryEntity(title: title, color: color, priority: priority);
+                            context.read<CategoryBloc>().add(CreateCategory(newCategory));
                           },
                         );
-
-                        // return CategoryTileV2(
-                        //   category: null, // Null indica "Nueva Categoría"
-                        //   onSave: (title, color, priority) {
-                        //     final newCategory = CategoryEntity(
-                        //       title: title, 
-                        //       color: color, 
-                        //       priority: priority,
-                        //       // id es null
-                        //     );
-                        //     context.read<CategoryBloc>().add(CreateCategory(newCategory));
-                        //   },
-                        //   // No pasamos onDelete porque no se puede borrar lo que no existe
-                        // );
-
-
 
                       }
 
                       final category = state.categories[index];
                       return CategoryTile(
+                        key: ValueKey(category.id),
                         category: category, 
                         onSave: (String title, int color, int priority) { 
-                          logger.d('Guardando... ');
+                          logger.d('Actualizando... ');
+                          final updatedCategory = CategoryEntity(id: category.id, title: title, color: color, priority: priority);
+                          context.read<CategoryBloc>().add(UpdateCategory(updatedCategory));
+                        },
+                        onDelete: () {
+                          logger.d('Borrando....');
+                          context.read<CategoryBloc>().add(RequestDeleteCategory(category));
                         },
                       );
-
-                      
-                      // return CategoryTileV2(
-                      //   category: category,
-                      //   // Se llama automáticamente al perder foco
-                      //   onSave: (title, color, priority) {
-                      //      final updatedCategory = CategoryEntity(
-                      //         id: category.id,
-                      //         title: title,
-                      //         color: color,
-                      //         priority: priority,
-                      //      );
-                      //      context.read<CategoryBloc>().add(UpdateCategory(updatedCategory));
-                      //   },
-                      //   // Botón de basura
-                      //   onDelete: () {
-                      //     context.read<CategoryBloc>().add(RequestDeleteCategory(category));
-                      //   },
-                      // );
-
-
 
                     },
                   ),
