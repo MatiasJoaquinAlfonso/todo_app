@@ -1,4 +1,7 @@
+import 'package:drift/drift.dart';
 import 'package:todo_app/features/database/database.dart';
+import 'package:todo_app/features/todo/data/mappers/category_mapper.dart';
+import 'package:todo_app/features/todo/domain/entities/category_entity.dart';
 import 'package:todo_app/features/todo/domain/entities/event_entity.dart';
 import 'package:todo_app/features/todo/domain/repositories/event_repository.dart';
 import 'package:todo_app/features/todo/data/mappers/event_mapper.dart';
@@ -12,10 +15,27 @@ class EventRepositoryImpl extends EventRepository {
   @override
   Stream<List<EventEntity>> getEvents({bool isDone = false}) {
 
-    final query = db.select(db.events)..where((tbl) => tbl.isDone.equals(isDone));
-    return query.watch().map((driftList) {
-      return driftList.map((e) => e.toEntity()).toList();
-    },);
+    final query = db.select(db.events).join([
+      leftOuterJoin(
+        db.categoriesTable,
+        db.categoriesTable.id.equalsExp(db.events.fkCategoryID),
+      ),
+    ])..where(db.events.isDone.equals(isDone));
+
+    return query.watch().map((rows) {
+      return rows.map((row) {
+        final eventData = row.readTable(db.events);
+        final categoryData = row.readTableOrNull(db.categoriesTable);
+
+        CategoryEntity? categoryEntity = categoryData?.toEntity();
+        return eventData.toEntity(category: categoryEntity);
+      }).toList();
+    });
+
+
+    // return query.watch().map((driftList) {
+    //   return driftList.map((e) => e.toEntity()).toList();
+    // },);
 
     // return db.watchAllEvents().map((driftList){
     //   return driftList.map((item) => item.toEntity()).toList();

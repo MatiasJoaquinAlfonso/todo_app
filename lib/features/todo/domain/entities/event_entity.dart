@@ -1,5 +1,6 @@
 
 import 'package:equatable/equatable.dart';
+import 'package:todo_app/features/todo/domain/entities/category_entity.dart';
 
 class EventEntity extends Equatable {
 
@@ -12,6 +13,7 @@ class EventEntity extends Equatable {
   final bool isAllDay;
   final bool isDone;
   final int? color;
+  final CategoryEntity? category;
 
   const EventEntity({ 
     this.id,
@@ -22,7 +24,8 @@ class EventEntity extends Equatable {
     required this.dateFinish,
     this.isAllDay = false,
     this.isDone = false,
-    this.color,
+    this.color, 
+    this.category,
   });
 
   EventEntity copyWith({
@@ -35,6 +38,7 @@ class EventEntity extends Equatable {
     bool? isAllDay,
     bool? isDone,
     int? color,
+    CategoryEntity? category,
   }) {
     return EventEntity(
       id: id ?? this.id,
@@ -46,9 +50,10 @@ class EventEntity extends Equatable {
       isAllDay: isAllDay ?? this.isAllDay,
       isDone: isDone ?? this.isDone,
       color: color ?? this.color,
+      category: category ?? this.category,
     );
   }
   
   @override
-  List<Object?> get props => [id, title, subTitle, description, dateInit, dateFinish, isAllDay, isDone, color];
+  List<Object?> get props => [id, title, subTitle, description, dateInit, dateFinish, isAllDay, isDone, color, category];
 }

@@ -26,6 +26,9 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
             title: 'Eliminar categoria',
             message: 'Esta categoria tiene ${state.categoriesCount} tareas',
             cancelText: 'Cancelar',
+            onCancel: () {
+              context.read<CategoryBloc>().add(CancelDeleteCategory());
+            },
             otherActionText: 'Solo categoria',
             onOtherAction: () {
               context.read<CategoryBloc>().add(

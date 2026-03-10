@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart';
 import 'package:todo_app/features/todo/presentation/bloc/todo_bloc.dart';
 
 import '../shared/widgets/widgets.dart';
@@ -42,13 +41,18 @@ class TaskFinishScreen extends StatelessWidget {
                 itemBuilder: (context, index) {
                             
                   final task = state.events[index];
-                  return Dismissible(
-                    key: Key(task.id.toString()),
-                    // direction: DismissDirection.endToStart,
-                    
-                    // Completado
+                  return TaskCard(
+                    title: task.title, 
+                    subTitle: task.description ?? '',
+                    dateInit: task.dateInit,
+                    dateFinish: task.dateFinish,
+                    borderRadius: 15,
+                    categoryName: task.category?.title,
+                    categoryPriority: task.category?.priority,
+                    categoryColor: task.category != null ? Color(task.category!.color) : null,
+                    onTap: () {}, 
+                    dismissKey: 'finish_${task.id}',
                     background: Container(
-                      margin: const EdgeInsets.symmetric(vertical: 4),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(15),
                         gradient: LinearGradient(
@@ -69,10 +73,7 @@ class TaskFinishScreen extends StatelessWidget {
                         size: 30,
                       ),
                     ),
-                
-                    //Borrado 
                     secondaryBackground: Container(
-                      margin: const EdgeInsets.symmetric(vertical: 4),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(15),
                         gradient: LinearGradient(
@@ -82,8 +83,7 @@ class TaskFinishScreen extends StatelessWidget {
                             const Color.fromARGB(36, 124, 207, 97),
                             Colors.green.shade700,
                           ],
-                          stops: const [0.4, 1.0],
-                            
+                          stops: const [0.4, 1.0], 
                         ),
                       ),
                       alignment: Alignment.centerRight,
@@ -94,41 +94,15 @@ class TaskFinishScreen extends StatelessWidget {
                         size: 30,
                       ),
                     ),
-                
-                    confirmDismiss: (direction) async {
-                
-                      if(direction == DismissDirection.startToEnd) {
-                        context.read<TodoBloc>().add(TodoDeleted(task));
-                      
-                      } else {
-                        final completedTask = task.copyWith(isDone: false);
-                        
-                        context.read<TodoBloc>().add(TodoUpdated(completedTask));
-
-                      }
-                
+                    onSwipeRight: () async {
+                      context.read<TodoBloc>().add(TodoDeleted(task));
                       return false;
                     },
-                            
-                    child: TaskCard(
-                      title: task.title, 
-                      subTitle: task.description ?? '',
-                      longDescription: 
-                        'Inicio: ${task.dateInit.day}/${task.dateInit.month} - ${task.dateInit.hour}:${task.dateInit.minute.toString().padLeft(2, '0')}\n' // Día/Mes
-                        'Fin: ${task.dateFinish.day}/${task.dateFinish.month} - ${task.dateFinish.hour}:${task.dateFinish.minute.toString().padLeft(2, '0')}', // Día/Mes
-                      borderRadius: 15,
-                      onTap: () => context.push('/task-screen', extra: task),
-                    ),
-
-                    // child: TaskCard(
-                    //   title: task.title, 
-                    //   subTitle:     
-                    //     'Inicio: ${task.dateInit.day}/${task.dateInit.month} - ${task.dateInit.hour}:${task.dateInit.minute.toString().padLeft(2, '0')}\t\t\t' // Día/Mes
-                    //     'Fin: ${task.dateFinish.day}/${task.dateFinish.month} - ${task.dateFinish.hour}:${task.dateFinish.minute.toString().padLeft(2, '0')}', // Día/Mes,
-                    //   longDescription: task.description ?? '',
-                    //   borderRadius: 15,
-                    //   onTap: () => context.push('/task-screen', extra: task),
-                    // ),
+                    onSwipeLeft: () async {
+                      final completedTask = task.copyWith(isDone: false);
+                      context.read<TodoBloc>().add(TodoUpdated(completedTask));
+                      return false;
+                    },
                   );
                 },
                             

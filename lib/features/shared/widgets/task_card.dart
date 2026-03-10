@@ -5,26 +5,75 @@ class TaskCard extends StatelessWidget {
 
   final String title;
   final String subTitle;
-  final String longDescription;
   final double borderRadius;
   final VoidCallback onTap;
+
+  final Color? categoryColor;
+  final String? categoryName;
+  final int? categoryPriority;
+  final DateTime dateInit;
+  final DateTime dateFinish;
+
+  // final Function(DismissDirection)? onDismiss;
+  final String? dismissKey;
+  final Widget? background;
+  final Widget? secondaryBackground;
+  final Future<bool?> Function()? onSwipeLeft; // Swipe from right to left
+  final Future<bool?> Function()? onSwipeRight; // Swipe from left to right
 
   const TaskCard({
     super.key, 
     required this.title, 
     this.subTitle = '', 
-    required this.longDescription,
     required this.borderRadius, 
-  required this.onTap, 
+    required this.onTap, 
+    this.categoryColor, 
+    this.categoryName, 
+    this.categoryPriority, 
+    required this.dateInit, 
+    required this.dateFinish,
+    this.dismissKey,
+    this.background,
+    this.secondaryBackground,
+    this.onSwipeLeft,
+    this.onSwipeRight,
   });
+
+  String get _priorityText {
+    switch (categoryPriority) {
+      case 1:
+        return 'Baja';
+      case 2:
+        return 'Media';
+      case 3:
+        return 'Alta';
+      default:
+        return 'Sin prioridad';
+    }
+  }
+
+  Color get _priorityColor {
+    switch (categoryPriority) {
+      case 1:
+        return Colors.green;
+      case 2:
+        return Colors.orange;
+      case 3:
+        return Colors.red;
+      default:
+        return Colors.grey;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Theme(
+    Widget cardContent = Theme(
       data: Theme.of(context).copyWith(
         dividerColor: Colors.transparent
       ),
       child: Card(
+        margin: EdgeInsets.zero,
+        color: categoryColor?.withAlpha(40) ?? Theme.of(context).colorScheme.surfaceContainerLowest,
         clipBehavior: Clip.antiAlias,
         elevation: 2,
         child: ExpansionTile(
@@ -34,16 +83,35 @@ class TaskCard extends StatelessWidget {
             onTap: onTap,
             child: Text(title,)
           ),
-          subtitle: GestureDetector(
-            behavior: HitTestBehavior.opaque,
-            onTap: onTap,
-            child: Text(
-              subTitle, 
-              maxLines: 1, 
-              overflow: TextOverflow.ellipsis,
-            ),
+          subtitle: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(categoryName ?? 'Sin categoría'),
+              if (categoryPriority != null)
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).cardColor.withAlpha(150),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.flag, size: 14, color: _priorityColor),
+                      const SizedBox(width: 6),
+                      Text(
+                        _priorityText,
+                        style: const TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+            ],
           ),
-        
+
           children: [
             Container(
               color: Theme.of(context).colorScheme.surfaceContainerLowest,
@@ -52,9 +120,30 @@ class TaskCard extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
                 child: Align(
                   alignment: Alignment.topLeft,
-                  child: Text(
-                    longDescription,
-                    style: TextStyle(fontSize: 15),
+                  child: Column(
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child: ListTile(
+                              contentPadding: EdgeInsets.zero,
+                              leading: Icon(Icons.play_circle_outline_outlined),
+                              title: const Text('Inicio', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                              subtitle: Text('${dateInit.day}/${dateInit.month}/${dateFinish.year} - ${dateInit.hour}:${dateInit.minute.toString().padLeft(2, '0')}'),
+                            ),
+                          ),
+
+                          Expanded(
+                            child: ListTile(
+                              contentPadding: EdgeInsets.zero,
+                              leading: Icon(Icons.stop_circle_outlined),
+                              title: const Text('Fin', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                              subtitle: Text('${dateFinish.day}/${dateFinish.month}/${dateFinish.year} - ${dateFinish.hour}:${dateFinish.minute.toString().padLeft(2, '0')}'),
+                            ),
+                          )
+                        ],
+                      )
+                    ],
                   ),
                 ),
               ),
@@ -62,14 +151,40 @@ class TaskCard extends StatelessWidget {
         
           ],
           
-        
-          // collapsedBackgroundColor: ,
-          // trailing: IconButton(
-          //   onPressed: () {}, 
-          //   icon: Icon(Icons.keyboard_arrow_down_rounded)
-          // ),
         ),
       ),
+    );
+
+    Widget finalWidget;
+
+    if (dismissKey != null && (onSwipeLeft != null || onSwipeRight != null)) {
+      finalWidget = ClipRRect(
+        borderRadius: BorderRadius.circular(borderRadius),
+        child: Dismissible(
+          key: Key(dismissKey!),
+          background: background,
+          secondaryBackground: secondaryBackground,
+          confirmDismiss: (direction) async {
+            if (direction == DismissDirection.startToEnd && onSwipeRight != null) {
+              return onSwipeRight!();
+            } else if (direction == DismissDirection.endToStart && onSwipeLeft != null) {
+              return onSwipeLeft!();
+            }
+            return false;
+          },
+          child: cardContent,
+        ),
       );
+    } else {
+      finalWidget = ClipRRect(
+        borderRadius: BorderRadius.circular(borderRadius),
+        child: cardContent,
+      );
+    }
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4.0),
+      child: finalWidget,
+    );
   }
 }

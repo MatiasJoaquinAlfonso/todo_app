@@ -49,6 +49,8 @@ final class ConfirmDeleteCategory extends CategoryEvent {
   List<Object> get props => [deleteTasks, category];
 }
 
+final class CancelDeleteCategory extends CategoryEvent {}
+
 final class ValidateCategoryName extends CategoryEvent {
   final String name;
 

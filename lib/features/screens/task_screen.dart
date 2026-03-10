@@ -1,14 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:todo_app/features/todo/domain/entities/category_entity.dart';
 import 'package:todo_app/features/todo/domain/entities/event_entity.dart';
+import 'package:todo_app/features/todo/presentation/bloc/categories_bloc/bloc/category_bloc.dart';
 import 'package:todo_app/features/todo/presentation/bloc/todo_bloc.dart';
 import '../shared/widgets/widgets.dart';
 
 class TaskScreen extends StatefulWidget {
   final EventEntity? event;
 
-  const TaskScreen({super.key, this.event});
+  const TaskScreen({
+    super.key, 
+    this.event, 
+  });
 
   @override
   State<TaskScreen> createState() => _TaskScreenState();
@@ -26,10 +31,12 @@ class _TaskScreenState extends State<TaskScreen> {
   bool _allowPop = false;
   bool _isAllDay = false;
 
+  CategoryEntity? _selectedCategory;
+
   @override
   void initState() {
     super.initState();
-
+  
     if (_isEditing) {
       _titleController.text = widget.event!.title;
       _descriptionController.text = widget.event!.description ?? '';
@@ -38,6 +45,8 @@ class _TaskScreenState extends State<TaskScreen> {
       _isAllDay = widget.event!.isAllDay;
       _timeInit = TimeOfDay.fromDateTime(widget.event!.dateInit);
       _timeFinish = TimeOfDay.fromDateTime(widget.event!.dateFinish);
+
+      _selectedCategory = widget.event?.category;
     }
   }
 
@@ -152,6 +161,7 @@ class _TaskScreenState extends State<TaskScreen> {
         dateInit: finalDateInit,
         dateFinish: finalDateFinish,
         isAllDay: _isAllDay,
+        category: _selectedCategory,
       );
       context.read<TodoBloc>().add(TodoUpdated(updatedTask));
     } else {
@@ -162,6 +172,7 @@ class _TaskScreenState extends State<TaskScreen> {
         dateFinish: finalDateFinish,
         isAllDay: _isAllDay,
         isDone: false,
+        category: _selectedCategory,
       );
       context.read<TodoBloc>().add(TodoAdded(newTask));
     }
@@ -306,6 +317,55 @@ class _TaskScreenState extends State<TaskScreen> {
                       const SizedBox(height: 12),
                     ],
                   ),
+                ),
+              ),
+
+              SliverToBoxAdapter(
+                child: BlocBuilder<CategoryBloc, CategoryState>(
+                  builder: (context, state) {
+                    if (state is CategoryLoaded) {
+                      final categories = state.categories;
+                      if (categories.isEmpty) return const SizedBox.shrink();
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Padding(
+                            padding: EdgeInsets.only(left: 4.0, bottom: 8.0, top: 16.0),
+                            child: Text('Categoría', style: TextStyle(fontWeight: FontWeight.bold)),
+                          ),
+
+                          SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: Row(
+                              children: categories.map((category) {
+                                
+                                final isSelected = _selectedCategory?.id == category.id;
+                                return Padding(
+                                  padding: const EdgeInsets.only(right: 8.0),
+                                  child: ChoiceChip(
+                                    label: Text(category.title),
+                                    selected: isSelected,
+                                    selectedColor: Color(category.color).withAlpha(100),
+                                    side: BorderSide(
+                                       color: isSelected ? Color(category.color) : Colors.grey.withAlpha(50),
+                                       width: 1.5,
+                                    ),
+                                    onSelected: (bool selected) {
+                                      setState(() {
+                                        _selectedCategory = selected ? category : null;
+                                      });
+                                    },
+                                  ),
+                                );
+                              }).toList(),
+                            ),
+                          ),
+                        ],
+                      );
+                    }
+                    
+                    return const Center(child: CircularProgressIndicator()); 
+                  },
                 ),
               ),
 

@@ -11,6 +11,7 @@ class DialogUtils {
     String? confirmText,
     String? cancelText,
     VoidCallback? onConfirm,
+    VoidCallback? onCancel,
     bool isError = false,
 
     String? otherActionText,
@@ -26,7 +27,10 @@ class DialogUtils {
 
           if(cancelText != null)
             TextButton(
-              onPressed: () => context.pop(), 
+              onPressed: () {
+                context.pop();
+                if (onCancel != null) onCancel();
+              }, 
               child: Text(cancelText, style: TextStyle(color: Colors.blue)),
             ),
 

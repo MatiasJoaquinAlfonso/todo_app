@@ -231,10 +231,11 @@ class _CategoryTileState extends State<CategoryTile> {
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: const Icon(Icons.delete, color: Colors.white,),
                 ),
-                onDismissed: (direction) {
+                confirmDismiss: (direction) async {
                   if (widget.onDelete != null) {
                     widget.onDelete!();
                   }
+                  return false;
                 },
                   
                 child: Container(

@@ -94,14 +94,22 @@ final appRouter = GoRouter(
       path: '/task-screen',
       builder: (context, state) { 
         final taskToEdit = state.extra as EventEntity?;
-        return BlocProvider(
-          create: (context) => TodoBloc(
-            repository: context.read<EventRepository>()
-          ),
-
+        return MultiBlocProvider(
+          providers: [
+            BlocProvider(
+              create: (context) => TodoBloc(
+                repository: context.read<EventRepository>()
+              ),
+            ),
+            BlocProvider(
+              create: (context) => CategoryBloc(
+                eventRepository: context.read<EventRepository>(), 
+                categoryRepository: context.read<CategoryRepository>()
+              )..add(SubscribeToCategories()),
+            ),
+          ],
           child: TaskScreen(event: taskToEdit),
         );
-        
       },
     ),
 

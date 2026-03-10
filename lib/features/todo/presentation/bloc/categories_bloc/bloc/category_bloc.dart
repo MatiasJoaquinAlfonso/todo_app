@@ -23,7 +23,15 @@ class CategoryBloc extends Bloc<CategoryEvent, CategoryState> {
     on<UpdateCategory>(_onUpdated);
     on<RequestDeleteCategory>(_onDeletedRequest);
     on<ConfirmDeleteCategory>(_onConfirmDelete);
+    on<CancelDeleteCategory>(_onCancelDelete);
 
+  }
+
+  Future<void> _onCancelDelete(
+    CancelDeleteCategory event,
+    Emitter<CategoryState> emit,
+  ) async {
+    add(SubscribeToCategories());
   }
 
   Future<void> _onSubscribeToCategories(
