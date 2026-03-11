@@ -14,12 +14,11 @@ class TaskCard extends StatelessWidget {
   final DateTime dateInit;
   final DateTime dateFinish;
 
-  // final Function(DismissDirection)? onDismiss;
   final String? dismissKey;
   final Widget? background;
   final Widget? secondaryBackground;
-  final Future<bool?> Function()? onSwipeLeft; // Swipe from right to left
-  final Future<bool?> Function()? onSwipeRight; // Swipe from left to right
+  final Future<bool?> Function()? onSwipeLeft; 
+  final Future<bool?> Function()? onSwipeRight; 
 
   const TaskCard({
     super.key, 
@@ -69,13 +68,10 @@ class TaskCard extends StatelessWidget {
   Widget build(BuildContext context) {
     Widget cardContent = Theme(
       data: Theme.of(context).copyWith(
-        dividerColor: Colors.transparent
+        dividerColor: Colors.transparent,
       ),
-      child: Card(
-        margin: EdgeInsets.zero,
+      child: Container(
         color: categoryColor?.withAlpha(40) ?? Theme.of(context).colorScheme.surfaceContainerLowest,
-        clipBehavior: Clip.antiAlias,
-        elevation: 2,
         child: ExpansionTile(
         
           title: GestureDetector(
@@ -158,33 +154,30 @@ class TaskCard extends StatelessWidget {
     Widget finalWidget;
 
     if (dismissKey != null && (onSwipeLeft != null || onSwipeRight != null)) {
-      finalWidget = ClipRRect(
-        borderRadius: BorderRadius.circular(borderRadius),
-        child: Dismissible(
-          key: Key(dismissKey!),
-          background: background,
-          secondaryBackground: secondaryBackground,
-          confirmDismiss: (direction) async {
-            if (direction == DismissDirection.startToEnd && onSwipeRight != null) {
-              return onSwipeRight!();
-            } else if (direction == DismissDirection.endToStart && onSwipeLeft != null) {
-              return onSwipeLeft!();
-            }
-            return false;
-          },
-          child: cardContent,
-        ),
-      );
-    } else {
-      finalWidget = ClipRRect(
-        borderRadius: BorderRadius.circular(borderRadius),
+      finalWidget = Dismissible(
+        key: Key(dismissKey!),
+        background: background,
+        secondaryBackground: secondaryBackground,
+        confirmDismiss: (direction) async {
+          if (direction == DismissDirection.startToEnd && onSwipeRight != null) {
+            return onSwipeRight!();
+          } else if (direction == DismissDirection.endToStart && onSwipeLeft != null) {
+            return onSwipeLeft!();
+          }
+          return false;
+        },
         child: cardContent,
       );
+    } else {
+      finalWidget = cardContent;
     }
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4.0),
-      child: finalWidget,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(borderRadius),
+        child: finalWidget,
+      ),
     );
   }
 }

@@ -97,7 +97,7 @@ class HomePage extends StatelessWidget {
                   dismissKey: task.id.toString(),
                   background: Container(
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(15),
+                      // borderRadius: BorderRadius.circular(15),
                       gradient: LinearGradient(
                         begin: Alignment.centerRight,
                         end: Alignment.centerLeft,
@@ -118,7 +118,7 @@ class HomePage extends StatelessWidget {
                   ),
                   secondaryBackground: Container(
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(15),
+                      // borderRadius: BorderRadius.circular(15),
                       gradient: LinearGradient(
                         begin: Alignment.centerLeft,
                         end: Alignment.centerRight,
