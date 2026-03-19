@@ -66,17 +66,20 @@ class TaskCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    
+    final isLight = Theme.of(context).brightness == Brightness.light;
+
+    final backgroundColor  = isLight
+      ? HSLColor.fromColor(categoryColor!).withLightness(0.45).toColor()
+      : HSLColor.fromColor(categoryColor!).withLightness(0.25).toColor();
+
     Widget cardContent = Theme(
       data: Theme.of(context).copyWith(
         dividerColor: Colors.transparent,
       ),
       child: Container(
         color: categoryColor != null
-          ? (Theme.of(context).brightness == Brightness.light
-              ? HSLColor.fromColor(categoryColor!).withLightness(0.45).toColor()
-              : HSLColor.fromColor(categoryColor!).withLightness(0.25).toColor() )
-              // ? Color.lerp(Colors.white, categoryColor!, 0.45)!
-              // : categoryColor!.withAlpha(40))
+          ? backgroundColor
           : Theme.of(context).colorScheme.surfaceContainerLowest,
         child: ExpansionTile(
         
@@ -130,11 +133,7 @@ class TaskCard extends StatelessWidget {
             Container(
               // color: Theme.of(context).colorScheme.surfaceContainerLowest,
               color: categoryColor != null
-                ? (Theme.of(context).brightness == Brightness.light
-                    ? HSLColor.fromColor(categoryColor!).withLightness(0.45).toColor()
-                    : HSLColor.fromColor(categoryColor!).withLightness(0.25).toColor() )
-                    // ? Color.lerp(Colors.white, categoryColor!, 0.45)!
-                    // : categoryColor!.withAlpha(40))
+                ? backgroundColor
                 : Theme.of(context).colorScheme.surfaceContainerLowest,
 
               width: double.infinity,

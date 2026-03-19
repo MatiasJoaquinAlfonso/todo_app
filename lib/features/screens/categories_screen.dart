@@ -125,7 +125,11 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                           category: null, 
                           onSave: (String title, int color, int priority) { 
                             logger.d('Guardando... ');
-                            final newCategory = CategoryEntity(title: title, color: color, priority: priority);
+                            final newCategory = CategoryEntity(
+                              title: title, 
+                              color: color,
+                              priority: priority
+                            );
                             context.read<CategoryBloc>().add(CreateCategory(newCategory));
                           },
                         );

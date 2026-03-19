@@ -103,6 +103,11 @@ class _CategoryTileState extends State<CategoryTile> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isLight = theme.brightness == Brightness.light;
+
+    final backgroundColor  = isLight
+      ? HSLColor.fromColor(Color(_selectedColor)).withLightness(0.45).toColor()
+      : HSLColor.fromColor(Color(_selectedColor)).withLightness(0.25).toColor();
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -113,7 +118,8 @@ class _CategoryTileState extends State<CategoryTile> {
             padding: EdgeInsetsGeometry.all(8),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(16),
-              color: Color(_selectedColor).withAlpha(40),
+              color: backgroundColor,
+
               border: _isNewCategory 
                 ? Border.all(color: theme.hintColor.withAlpha(50), width: 2) 
                 : null,
@@ -129,7 +135,8 @@ class _CategoryTileState extends State<CategoryTile> {
                         controller: _controller,
                         focusNode: _focusNode,
                         style: TextStyle(
-                          color: theme.colorScheme.onSurface,
+                          // color: theme.colorScheme.onSurface,
+                          color: Colors.white,
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
                           decoration: TextDecoration.none,
@@ -241,7 +248,7 @@ class _CategoryTileState extends State<CategoryTile> {
                 child: Container(
                     padding: EdgeInsetsGeometry.all(8),
                     decoration: BoxDecoration(
-                      color: Color(_selectedColor).withAlpha(40),
+                      color: backgroundColor,
                       border: _isNewCategory 
                         ? Border.all(color: theme.hintColor.withAlpha(50), width: 2) 
                         : null,
@@ -257,9 +264,10 @@ class _CategoryTileState extends State<CategoryTile> {
                                 controller: _controller,
                                 focusNode: _focusNode,
                                 style: TextStyle(
-                                  color: theme.colorScheme.onSurface,
+                                  // color: theme.colorScheme.onSurface,
+                                  color: Colors.white,
                                   fontSize: 16,
-                                  fontWeight: FontWeight.w600,
+                                  fontWeight: FontWeight.w500,
                                   decoration: TextDecoration.none,
                                 ),
                                 decoration: InputDecoration(
@@ -420,7 +428,7 @@ class _SimpleColorPickerState extends State<_SimpleColorPicker> {
           onPressed:() {
             Navigator.pop(context);
           },
-          child: const Text('Cancelar'),
+          child: const Text('Cancelar', style: TextStyle(fontWeight: FontWeight.bold)),
         ),
         TextButton(
           onPressed:() {
