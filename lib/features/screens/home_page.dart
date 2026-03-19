@@ -97,7 +97,6 @@ class HomePage extends StatelessWidget {
                   dismissKey: task.id.toString(),
                   background: Container(
                     decoration: BoxDecoration(
-                      // borderRadius: BorderRadius.circular(15),
                       gradient: LinearGradient(
                         begin: Alignment.centerRight,
                         end: Alignment.centerLeft,

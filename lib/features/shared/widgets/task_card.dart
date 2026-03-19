@@ -73,20 +73,32 @@ class TaskCard extends StatelessWidget {
       child: Container(
         color: categoryColor != null
           ? (Theme.of(context).brightness == Brightness.light
-              ? Color.lerp(Colors.white, categoryColor!, 0.45)!
-              : categoryColor!.withAlpha(40))
+              ? HSLColor.fromColor(categoryColor!).withLightness(0.45).toColor()
+              : HSLColor.fromColor(categoryColor!).withLightness(0.25).toColor() )
+              // ? Color.lerp(Colors.white, categoryColor!, 0.45)!
+              // : categoryColor!.withAlpha(40))
           : Theme.of(context).colorScheme.surfaceContainerLowest,
         child: ExpansionTile(
         
           title: GestureDetector(
             behavior: HitTestBehavior.opaque,
             onTap: onTap,
-            child: Text(title,)
+            child: Text(
+              title,
+              style: TextStyle(
+                color: categoryColor != null ? Colors.white : Colors.black  
+              ),
+              )
           ),
           subtitle: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(categoryName ?? 'Sin categoría'),
+              Text(
+                categoryName ?? 'Sin categoría',
+                style: TextStyle(
+                    color: categoryColor != null ? Colors.white : Colors.black  
+                  ),
+                ),
               if (categoryPriority != null)
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -116,7 +128,15 @@ class TaskCard extends StatelessWidget {
 
           children: [
             Container(
-              color: Theme.of(context).colorScheme.surfaceContainerLowest,
+              // color: Theme.of(context).colorScheme.surfaceContainerLowest,
+              color: categoryColor != null
+                ? (Theme.of(context).brightness == Brightness.light
+                    ? HSLColor.fromColor(categoryColor!).withLightness(0.45).toColor()
+                    : HSLColor.fromColor(categoryColor!).withLightness(0.25).toColor() )
+                    // ? Color.lerp(Colors.white, categoryColor!, 0.45)!
+                    // : categoryColor!.withAlpha(40))
+                : Theme.of(context).colorScheme.surfaceContainerLowest,
+
               width: double.infinity,
               child: Padding(
                 padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
@@ -129,18 +149,43 @@ class TaskCard extends StatelessWidget {
                           Expanded(
                             child: ListTile(
                               contentPadding: EdgeInsets.zero,
-                              leading: Icon(Icons.play_circle_outline_outlined),
-                              title: const Text('Inicio', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-                              subtitle: Text('${dateInit.day}/${dateInit.month}/${dateFinish.year} - ${dateInit.hour}:${dateInit.minute.toString().padLeft(2, '0')}'),
+                              leading: Icon(
+                                Icons.play_circle_outline_outlined,
+                                color: categoryColor != null ? Colors.white : Colors.black
+                              ),
+                              title: Text(
+                                'Inicio', 
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold, 
+                                  fontSize: 14,
+                                  color: categoryColor != null ? Colors.white : Colors.black  
+                                )
+                              ),
+                              subtitle: Text(
+                                '${dateInit.day}/${dateInit.month}/${dateFinish.year} - ${dateInit.hour}:${dateInit.minute.toString().padLeft(2, '0')}',
+                                style: TextStyle(color: categoryColor != null ? Colors.white : Colors.black )
+                              ),
                             ),
                           ),
 
                           Expanded(
                             child: ListTile(
                               contentPadding: EdgeInsets.zero,
-                              leading: Icon(Icons.stop_circle_outlined),
-                              title: const Text('Fin', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-                              subtitle: Text('${dateFinish.day}/${dateFinish.month}/${dateFinish.year} - ${dateFinish.hour}:${dateFinish.minute.toString().padLeft(2, '0')}'),
+                              leading: Icon(
+                                Icons.stop_circle_outlined,
+                                color: categoryColor != null ? Colors.white : Colors.black,
+                              ),
+                              title: Text(
+                                'Fin', 
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold, 
+                                  fontSize: 14,
+                                  color: categoryColor != null ? Colors.white : Colors.black,
+                                )),
+                              subtitle: Text(
+                                '${dateFinish.day}/${dateFinish.month}/${dateFinish.year} - ${dateFinish.hour}:${dateFinish.minute.toString().padLeft(2, '0')}',
+                                style: TextStyle(color: categoryColor != null ? Colors.white : Colors.black  )
+                              ),
                             ),
                           )
                         ],

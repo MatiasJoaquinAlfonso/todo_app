@@ -1,3 +1,5 @@
+// import 'dart:ui';
+
 import 'package:flutter/material.dart';
 
 const colorList = <Color>[
@@ -54,7 +56,25 @@ class AppTheme {
 
       iconTheme: IconThemeData(
         // color: isDarkMode ? Colors.white : Colors.black
+      ),
+
+      datePickerTheme: DatePickerThemeData(
+        backgroundColor: isDarkMode ? const Color(0xFF1E1E2C) : Colors.white,
+      ),
+
+      timePickerTheme: TimePickerThemeData(
+        backgroundColor: isDarkMode ? const Color(0xFF1E1E2C) : Colors.white,
+        dialBackgroundColor: isDarkMode ? const Color(0xFF1E1E2C) : Colors.white,
+        dayPeriodColor: Color.fromARGB(255, 101, 169, 215),
+        dialHandColor: Color.fromARGB(255, 101, 169, 215),
+
+        // elevation: ,
+        // entryModeIconColor: ,
+        // helpTextStyle: ,
+        // hourMinuteColor: Color.fromARGB(255, 101, 169, 215),
+        // inputDecorationTheme: ,
       )
+
 
     );
 

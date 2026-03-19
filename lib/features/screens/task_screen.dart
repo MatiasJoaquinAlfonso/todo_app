@@ -72,19 +72,6 @@ class _TaskScreenState extends State<TaskScreen> {
         start: _dateInit,
         end: _dateFinish.isBefore(_dateInit) ? _dateInit : _dateFinish,
       ),
-      builder: (context, child) {
-        return Theme(
-          data: Theme.of(context).copyWith(
-            colorScheme: ColorScheme.dark(
-              primary: Colors.blue,
-              onPrimary: Colors.white,
-              surface: Colors.grey.shade900,
-              onSurface: Colors.white,
-            ),
-          ),
-          child: child!,
-        );
-      },
     );
     if (picked != null) {
       setState(() {
@@ -99,19 +86,6 @@ class _TaskScreenState extends State<TaskScreen> {
     final picked = await showTimePicker(
       context: context, 
       initialTime: isStart ? _timeInit : _timeFinish,
-      builder: (context, child) {
-        return Theme(
-          data: Theme.of(context).copyWith(
-            colorScheme: ColorScheme.dark(
-              primary: Colors.blue,
-              onPrimary: Colors.white,
-              surface: Colors.grey.shade900,
-              onSurface: Colors.white,
-            ),
-          ),
-          child: child!,
-        );
-      },
     );
 
     if (picked != null){
