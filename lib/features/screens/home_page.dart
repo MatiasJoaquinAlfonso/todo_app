@@ -140,12 +140,7 @@ class HomePage extends StatelessWidget {
                   onSwipeRight: () async {
                     final completedTask = task.copyWith(isDone: true);
                     context.read<TodoBloc>().add(TodoUpdated(completedTask));
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text("¡Tarea completada! 🎉"), 
-                        duration: Duration(seconds: 1)
-                      )
-                    );
+                    ConfettiSnackbar.show(context, "¡Tarea completada! 🎉");
                     return false;
                   },
                   onSwipeLeft: () async {

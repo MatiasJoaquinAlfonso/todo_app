@@ -60,9 +60,13 @@ class _TaskScreenState extends State<TaskScreen> {
   Future<void> _pickDateRange() async {
     final now = DateTime.now();
 
+    final today = DateTime(now.year, now.month, now.day);
+    final startDay = DateTime(_dateInit.year, _dateInit.month, _dateInit.day);
+    final firstAllowed = startDay.isBefore(today) ? startDay : today;
+
     final DateTimeRange? picked = await showDateRangePicker(
       context: context,
-      firstDate: DateTime(now.year, now.month, now.day),
+      firstDate: firstAllowed,
       lastDate: DateTime(2100),
       initialDateRange: DateTimeRange(
         start: _dateInit,

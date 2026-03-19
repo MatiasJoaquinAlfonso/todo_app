@@ -4,3 +4,4 @@ export 'botton_nav_bar.dart';
 export 'date_time_selector.dart';
 export 'dialog_utils.dart';
 export 'category_tile.dart';
+export 'confetti_snackbar.dart';

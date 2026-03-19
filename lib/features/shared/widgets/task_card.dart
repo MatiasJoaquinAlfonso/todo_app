@@ -71,7 +71,11 @@ class TaskCard extends StatelessWidget {
         dividerColor: Colors.transparent,
       ),
       child: Container(
-        color: categoryColor?.withAlpha(40) ?? Theme.of(context).colorScheme.surfaceContainerLowest,
+        color: categoryColor != null
+          ? (Theme.of(context).brightness == Brightness.light
+              ? Color.lerp(Colors.white, categoryColor!, 0.45)!
+              : categoryColor!.withAlpha(40))
+          : Theme.of(context).colorScheme.surfaceContainerLowest,
         child: ExpansionTile(
         
           title: GestureDetector(
@@ -87,7 +91,9 @@ class TaskCard extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
-                    color: Theme.of(context).cardColor.withAlpha(150),
+                    color: Theme.of(context).brightness == Brightness.light
+                        ? Colors.white.withAlpha(210)
+                        : Colors.black.withAlpha(120),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Row(

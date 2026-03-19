@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:todo_app/features/screens/categories_screen.dart';
@@ -92,23 +93,47 @@ final appRouter = GoRouter(
 
     GoRoute(
       path: '/task-screen',
-      builder: (context, state) { 
+      pageBuilder: (context, state) { 
         final taskToEdit = state.extra as EventEntity?;
-        return MultiBlocProvider(
-          providers: [
-            BlocProvider(
-              create: (context) => TodoBloc(
-                repository: context.read<EventRepository>()
+        return CustomTransitionPage(
+          key: state.pageKey,
+          transitionDuration: const Duration(milliseconds: 400),
+          reverseTransitionDuration: const Duration(milliseconds: 300),
+          child: MultiBlocProvider(
+            providers: [
+              BlocProvider(
+                create: (context) => TodoBloc(
+                  repository: context.read<EventRepository>()
+                ),
               ),
-            ),
-            BlocProvider(
-              create: (context) => CategoryBloc(
-                eventRepository: context.read<EventRepository>(), 
-                categoryRepository: context.read<CategoryRepository>()
-              )..add(SubscribeToCategories()),
-            ),
-          ],
-          child: TaskScreen(event: taskToEdit),
+              BlocProvider(
+                create: (context) => CategoryBloc(
+                  eventRepository: context.read<EventRepository>(), 
+                  categoryRepository: context.read<CategoryRepository>()
+                )..add(SubscribeToCategories()),
+              ),
+            ],
+            child: TaskScreen(event: taskToEdit),
+          ),
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            final offsetAnimation = Tween<Offset>(
+              begin: const Offset(0, 0.12),
+              end: Offset.zero,
+            ).animate(CurvedAnimation(
+              parent: animation,
+              curve: Curves.easeOutCubic,
+            ));
+            return SlideTransition(
+              position: offsetAnimation,
+              child: FadeTransition(
+                opacity: CurvedAnimation(
+                  parent: animation,
+                  curve: Curves.easeOut,
+                ),
+                child: child,
+              ),
+            );
+          },
         );
       },
     ),
