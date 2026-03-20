@@ -14,28 +14,13 @@ class ButtonNewTask extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
+    final theme = Theme.of(context);
+    final isLight = theme.brightness == Brightness.light;
+
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: paddingH, vertical: 8),
       child: DottedBorder(
-        // options: DottedBorderOptions(
-        //   borderType: BorderRadius.all(15),
-        //   color: Colors.blueAccent,
-
-        // ),
-        // options: RectDottedBorderOptions(
-        //   dashPattern: [10, 5],
-        //   strokeWidth: 2,
-        //   padding: EdgeInsets.all(16), 
-        // ),
-        // options: CustomPathDottedBorderOptions(
-        //   padding: const EdgeInsets.all(8),
-        //   color: Colors.blue,
-        //   strokeWidth: 2,
-        //   dashPattern: [10, 5],
-        //   customPath: (size) => Path()
-        //     ..moveTo(0, size.height)
-        //     ..relativeLineTo(size.width, 0),
-        // ),
         options: RoundedRectDottedBorderOptions(
           radius: Radius.circular(15),
           color: Colors.lightBlue,
@@ -44,6 +29,7 @@ class ButtonNewTask extends StatelessWidget {
           padding: EdgeInsets.zero
         ),
         child: Card(
+          color: (isLight ? Color(0xFFFFFFFF) : theme.colorScheme.surfaceContainerLowest),
           clipBehavior: Clip.antiAlias,
           elevation: 4,
           shape: RoundedRectangleBorder(
@@ -59,46 +45,11 @@ class ButtonNewTask extends StatelessWidget {
               ),
               leading: Icon(
                 Icons.add_rounded,
-                // textDirection: TextDirection.,
               ),
             ),
           ),
         ),
       ),
-      // child: Card(
-      //   elevation: 2,
-      //   shape: RoundedRectangleBorder(
-      //     borderRadius: BorderRadius.circular(15),
-      //     side: BorderSide(
-      //       color: Theme.of(context).colorScheme.outline,
-      //       width: 1.5,
-      //     ),
-      //   ),
-      //   clipBehavior: Clip.antiAlias,
-      //   child: InkWell(
-      //     onTap: () {
-      //     },
-      //     child: Center(
-      //       child: Row(
-      //         mainAxisAlignment: MainAxisAlignment.center,
-      //         children: [
-      //           Icon(
-      //             Icons.add_rounded,
-      //             color: Theme.of(context).colorScheme.primary,
-      //           ),
-      //           const SizedBox(width: 12),
-      //           Text(
-      //             'Añadir nueva tarea.',
-      //             style: TextStyle(
-                    
-      //             ),
-      //           ),
-
-      //         ],
-      //       ),
-      //     ),
-      //   ),
-      // ),
     );
 
   }

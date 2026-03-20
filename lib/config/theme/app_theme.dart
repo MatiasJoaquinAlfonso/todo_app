@@ -12,8 +12,6 @@ class AppTheme {
 
   final int selectedColor;
   final bool isDarkMode;
-  // final Color background =  Color(0x00f2f4f7);
-
 
   AppTheme({
     this.isDarkMode = false,
@@ -34,12 +32,11 @@ class AppTheme {
 
       scaffoldBackgroundColor: colorScheme.surfaceContainer,
 
-
       appBarTheme: AppBarTheme(
         centerTitle: true,
         elevation: 0,
         iconTheme: IconThemeData(color: colorScheme.primary),
-        backgroundColor: colorScheme.surfaceContainer,
+         backgroundColor: colorScheme.surfaceContainer,
         titleTextStyle: TextStyle(
           color: isDarkMode ? Colors.white : Colors.black87,
           fontSize: 22,

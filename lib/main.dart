@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:todo_app/config/router/app_router.dart';
 import 'package:todo_app/config/theme/app_theme.dart';
 import 'package:todo_app/features/database/database.dart';
+import 'package:todo_app/features/shared/services/preferences_service.dart';
 import 'package:todo_app/features/todo/data/repositories/category_repository_impl.dart';
 import 'package:todo_app/features/todo/data/repositories/event_repository_impl.dart';
 import 'package:todo_app/features/todo/domain/repositories/category_repository.dart';
@@ -17,6 +18,8 @@ void main() async {
   await notificationService.init();
   //Apenas iniciamos la app solicitamos los permisos.
   notificationService.requestPermissions();
+  
+  await PreferencesService.init();
 
   final db = AppDatabase();
 

@@ -71,7 +71,7 @@ class TaskCard extends StatelessWidget {
 
     final backgroundColor = categoryColor != null
       ? (isLight
-          ? HSLColor.fromColor(categoryColor!).withLightness(0.45).toColor()
+          ? HSLColor.fromColor(categoryColor!).withLightness(0.40).toColor()
           : HSLColor.fromColor(categoryColor!).withLightness(0.25).toColor())
       : Theme.of(context).colorScheme.surfaceContainerLowest;
 
@@ -82,7 +82,8 @@ class TaskCard extends StatelessWidget {
       child: Container(
         color: categoryColor != null
           ? backgroundColor
-          : Theme.of(context).colorScheme.surfaceContainerLowest,
+          : (isLight ? Color(0xFFFFFFFF) : theme.colorScheme.surfaceContainerLowest),
+          // : Color(0xFFFFFFFF),
         child: ExpansionTile(
 
           title: GestureDetector(
@@ -91,7 +92,9 @@ class TaskCard extends StatelessWidget {
             child: Text(
               title,
               style: TextStyle(
-                color: categoryColor != null ? Colors.white : theme.colorScheme.onSurface
+                // color: categoryColor != null ? Colors.white70 : theme.colorScheme.onSurface
+                fontWeight: FontWeight.bold,
+                color: theme.colorScheme.onSurface,
               ),
               )
           ),
@@ -101,9 +104,10 @@ class TaskCard extends StatelessWidget {
               Text(
                 categoryName ?? 'Sin categoría',
                 style: TextStyle(
-                    color: categoryColor != null 
-                      ? Colors.white 
-                      : theme.colorScheme.onSurface
+                    color: theme.colorScheme.onSurface,
+                    // color: categoryColor != null 
+                    //   ? Colors.white 
+                    //   : theme.colorScheme.onSurface
                   ),
                 ),
               if (categoryPriority != null)
@@ -157,23 +161,30 @@ class TaskCard extends StatelessWidget {
                               contentPadding: EdgeInsets.zero,
                               leading: Icon(
                                 Icons.play_circle_outline_outlined,
-                                color: categoryColor != null 
-                                  ? Colors.white 
-                                  : theme.colorScheme.onSurface
+                                color: theme.colorScheme.onSurface,
+                                // color: categoryColor != null 
+                                //   ? Colors.white 
+                                //   : theme.colorScheme.onSurface
                               ),
                               title: Text(
                                 'Inicio', 
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold, 
                                   fontSize: 14,
-                                  color: categoryColor != null 
-                                    ? Colors.white 
-                                    : theme.colorScheme.onSurface  
+                                  color: theme.colorScheme.onSurface,
+                                  // color: categoryColor != null 
+                                  //   ? Colors.white 
+                                  //   : theme.colorScheme.onSurface  
                                 )
                               ),
                               subtitle: Text(
                                 '${dateInit.day}/${dateInit.month}/${dateFinish.year} - ${dateInit.hour}:${dateInit.minute.toString().padLeft(2, '0')}',
-                                style: TextStyle(color: categoryColor != null ? Colors.white : theme.colorScheme.onSurface )
+                                style: TextStyle(
+                                  color: theme.colorScheme.onSurface,
+                                  // color: categoryColor != null 
+                                  //   ? Colors.white 
+                                  //   : theme.colorScheme.onSurface 
+                                )
                               ),
                             ),
                           ),
@@ -183,18 +194,23 @@ class TaskCard extends StatelessWidget {
                               contentPadding: EdgeInsets.zero,
                               leading: Icon(
                                 Icons.stop_circle_outlined,
-                                color: categoryColor != null ? Colors.white : theme.colorScheme.onSurface,
+                                // color: categoryColor != null ? Colors.white : theme.colorScheme.onSurface,
+                                color: theme.colorScheme.onSurface,
                               ),
                               title: Text(
                                 'Fin', 
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold, 
                                   fontSize: 14,
-                                  color: categoryColor != null ? Colors.white : theme.colorScheme.onSurface,
+                                  // color: categoryColor != null ? Colors.white : theme.colorScheme.onSurface,
+                                  color: theme.colorScheme.onSurface,
                                 )),
                               subtitle: Text(
                                 '${dateFinish.day}/${dateFinish.month}/${dateFinish.year} - ${dateFinish.hour}:${dateFinish.minute.toString().padLeft(2, '0')}',
-                                style: TextStyle(color: categoryColor != null ? Colors.white : theme.colorScheme.onSurface )
+                                style: TextStyle(
+                                  // color: categoryColor != null ? Colors.white : theme.colorScheme.onSurface 
+                                  color: theme.colorScheme.onSurface,
+                                )
                               ),
                             ),
                           )
