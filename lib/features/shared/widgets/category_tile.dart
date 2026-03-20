@@ -109,6 +109,14 @@ class _CategoryTileState extends State<CategoryTile> {
       ? HSLColor.fromColor(Color(_selectedColor)).withLightness(0.45).toColor()
       : HSLColor.fromColor(Color(_selectedColor)).withLightness(0.25).toColor();
 
+    // final backgroundColor = _selectedColor != null
+    //   ? (isLight
+    //       ? HSLColor.fromColor(Color(_selectedColor)).withLightness(0.45).toColor()
+    //       : HSLColor.fromColor(Color(_selectedColor)).withLightness(0.25).toColor())
+    //   : theme.colorScheme.surfaceContainerLowest;
+
+
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: TapRegion(
@@ -160,7 +168,8 @@ class _CategoryTileState extends State<CategoryTile> {
                             vertical: 4,
                           ),
                           decoration: BoxDecoration(
-                            color: theme.cardColor.withAlpha(200),
+                            // color: theme.cardColor.withAlpha(200),
+                            color: Colors.white,
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Row(
@@ -173,6 +182,9 @@ class _CategoryTileState extends State<CategoryTile> {
                                 style: TextStyle(
                                   fontSize: 12,
                                   fontWeight: FontWeight.w500,
+                                  color: isLight
+                                    ? theme.colorScheme.onSurface
+                                    : theme.colorScheme.onInverseSurface,
                                 ),
                               ),
                             ],
@@ -289,7 +301,8 @@ class _CategoryTileState extends State<CategoryTile> {
                                     vertical: 4,
                                   ),
                                   decoration: BoxDecoration(
-                                    color: theme.cardColor.withAlpha(200),
+                                    // color: theme.cardColor.withAlpha(200),
+                                    color: Colors.white,
                                     borderRadius: BorderRadius.circular(8),
                                   ),
                                   child: Row(
@@ -302,6 +315,9 @@ class _CategoryTileState extends State<CategoryTile> {
                                         style: TextStyle(
                                           fontSize: 12,
                                           fontWeight: FontWeight.w500,
+                                          color: isLight
+                                            ? theme.colorScheme.onSurface
+                                            : theme.colorScheme.onInverseSurface,
                                         ),
                                       ),
                                     ],

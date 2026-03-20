@@ -66,12 +66,14 @@ class TaskCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    
-    final isLight = Theme.of(context).brightness == Brightness.light;
+    final theme = Theme.of(context);
+    final isLight = theme.brightness == Brightness.light;
 
-    final backgroundColor  = isLight
-      ? HSLColor.fromColor(categoryColor!).withLightness(0.45).toColor()
-      : HSLColor.fromColor(categoryColor!).withLightness(0.25).toColor();
+    final backgroundColor = categoryColor != null
+      ? (isLight
+          ? HSLColor.fromColor(categoryColor!).withLightness(0.45).toColor()
+          : HSLColor.fromColor(categoryColor!).withLightness(0.25).toColor())
+      : Theme.of(context).colorScheme.surfaceContainerLowest;
 
     Widget cardContent = Theme(
       data: Theme.of(context).copyWith(
@@ -82,14 +84,14 @@ class TaskCard extends StatelessWidget {
           ? backgroundColor
           : Theme.of(context).colorScheme.surfaceContainerLowest,
         child: ExpansionTile(
-        
+
           title: GestureDetector(
             behavior: HitTestBehavior.opaque,
             onTap: onTap,
             child: Text(
               title,
               style: TextStyle(
-                color: categoryColor != null ? Colors.white : Colors.black  
+                color: categoryColor != null ? Colors.white : theme.colorScheme.onSurface
               ),
               )
           ),
@@ -99,16 +101,20 @@ class TaskCard extends StatelessWidget {
               Text(
                 categoryName ?? 'Sin categoría',
                 style: TextStyle(
-                    color: categoryColor != null ? Colors.white : Colors.black  
+                    color: categoryColor != null 
+                      ? Colors.white 
+                      : theme.colorScheme.onSurface
                   ),
                 ),
               if (categoryPriority != null)
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
-                    color: Theme.of(context).brightness == Brightness.light
-                        ? Colors.white.withAlpha(210)
-                        : Colors.black.withAlpha(120),
+                    // color: theme.colorScheme.onSurface,
+                    color: Colors.white,
+                    // color: isLight
+                    //     ? Colors.white.withAlpha(210)
+                    //     : theme.colorScheme.onSurface,
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Row(
@@ -118,8 +124,11 @@ class TaskCard extends StatelessWidget {
                       const SizedBox(width: 6),
                       Text(
                         _priorityText,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 12,
+                          color: isLight
+                            ? theme.colorScheme.onSurface
+                            : theme.colorScheme.onInverseSurface,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -132,9 +141,7 @@ class TaskCard extends StatelessWidget {
           children: [
             Container(
               // color: Theme.of(context).colorScheme.surfaceContainerLowest,
-              color: categoryColor != null
-                ? backgroundColor
-                : Theme.of(context).colorScheme.surfaceContainerLowest,
+              color: backgroundColor,
 
               width: double.infinity,
               child: Padding(
@@ -150,19 +157,23 @@ class TaskCard extends StatelessWidget {
                               contentPadding: EdgeInsets.zero,
                               leading: Icon(
                                 Icons.play_circle_outline_outlined,
-                                color: categoryColor != null ? Colors.white : Colors.black
+                                color: categoryColor != null 
+                                  ? Colors.white 
+                                  : theme.colorScheme.onSurface
                               ),
                               title: Text(
                                 'Inicio', 
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold, 
                                   fontSize: 14,
-                                  color: categoryColor != null ? Colors.white : Colors.black  
+                                  color: categoryColor != null 
+                                    ? Colors.white 
+                                    : theme.colorScheme.onSurface  
                                 )
                               ),
                               subtitle: Text(
                                 '${dateInit.day}/${dateInit.month}/${dateFinish.year} - ${dateInit.hour}:${dateInit.minute.toString().padLeft(2, '0')}',
-                                style: TextStyle(color: categoryColor != null ? Colors.white : Colors.black )
+                                style: TextStyle(color: categoryColor != null ? Colors.white : theme.colorScheme.onSurface )
                               ),
                             ),
                           ),
@@ -172,18 +183,18 @@ class TaskCard extends StatelessWidget {
                               contentPadding: EdgeInsets.zero,
                               leading: Icon(
                                 Icons.stop_circle_outlined,
-                                color: categoryColor != null ? Colors.white : Colors.black,
+                                color: categoryColor != null ? Colors.white : theme.colorScheme.onSurface,
                               ),
                               title: Text(
                                 'Fin', 
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold, 
                                   fontSize: 14,
-                                  color: categoryColor != null ? Colors.white : Colors.black,
+                                  color: categoryColor != null ? Colors.white : theme.colorScheme.onSurface,
                                 )),
                               subtitle: Text(
                                 '${dateFinish.day}/${dateFinish.month}/${dateFinish.year} - ${dateFinish.hour}:${dateFinish.minute.toString().padLeft(2, '0')}',
-                                style: TextStyle(color: categoryColor != null ? Colors.white : Colors.black  )
+                                style: TextStyle(color: categoryColor != null ? Colors.white : theme.colorScheme.onSurface )
                               ),
                             ),
                           )

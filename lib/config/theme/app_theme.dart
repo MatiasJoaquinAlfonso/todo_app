@@ -24,6 +24,7 @@ class AppTheme {
     
     final colorScheme = ColorScheme.fromSeed(
         seedColor: colorList[selectedColor],
+        
         brightness: isDarkMode ?  Brightness.dark : Brightness.light,
       );
 
@@ -31,10 +32,14 @@ class AppTheme {
       useMaterial3: true,
       colorScheme: colorScheme,
 
+      scaffoldBackgroundColor: colorScheme.surfaceContainer,
+
+
       appBarTheme: AppBarTheme(
         centerTitle: true,
         elevation: 0,
         iconTheme: IconThemeData(color: colorScheme.primary),
+        backgroundColor: colorScheme.surfaceContainer,
         titleTextStyle: TextStyle(
           color: isDarkMode ? Colors.white : Colors.black87,
           fontSize: 22,
