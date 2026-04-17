@@ -22,6 +22,7 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       backgroundColor: cs.surface,
       body: SafeArea(
+        bottom: false,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -229,7 +230,7 @@ class _HomePageState extends State<HomePage> {
                         ),
                         SliverToBoxAdapter(
                           child: Padding(
-                            padding: const EdgeInsets.fromLTRB(20, 32, 20, 24),
+                            padding: const EdgeInsets.fromLTRB(20, 32, 20, 120),
                             child: _WeeklyFocusWidget(),
                           ),
                         ),
