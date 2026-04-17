@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-
+import 'package:google_fonts/google_fonts.dart';
 import 'package:todo_app/features/todo/domain/entities/category_entity.dart';
 
+/// Stitch-compliant category tile — No-Line, tonal depth.
 class CategoryTile extends StatefulWidget {
   final CategoryEntity? category;
   final Function(String title, int color, int priority) onSave;
@@ -19,47 +20,39 @@ class CategoryTile extends StatefulWidget {
 }
 
 class _CategoryTileState extends State<CategoryTile> {
-  bool get _isNewCategory => widget.category == null;
+  bool get _isNew => widget.category == null;
   final FocusNode _focusNode = FocusNode();
 
   late int _priority;
   late TextEditingController _controller;
-  late int _selectedColor = 0xFF2196F3;
+  late int _selectedColor;
 
   @override
   void initState() {
     super.initState();
-    _controller = TextEditingController(
-      text: widget.category?.title ?? 'Nueva categoria',
-    );
-    _selectedColor = widget.category?.color ?? _selectedColor;
+    _selectedColor = widget.category?.color ?? 0xFF5C6BC0;
     _priority = widget.category?.priority ?? 0;
-
+    _controller = TextEditingController(
+      text: widget.category?.title ?? '',
+    );
     _focusNode.addListener(() {
-      if (!_focusNode.hasFocus) {
-        _trySave();
-      }
+      if (!_focusNode.hasFocus) _trySave();
     });
   }
 
   void _trySave() {
-    final tituloActual = _controller.text.trim();
-    final esVacioODefecto = tituloActual.isEmpty || tituloActual == 'Nueva categoria' || tituloActual == 'Nueva categoría....' || tituloActual == 'Nuevacategoria';
-
-    if (esVacioODefecto) {
-      if (_isNewCategory) {
-        _controller.text = '';
-      } else {
+    final text = _controller.text.trim();
+    if (text.isEmpty) {
+      if (!_isNew) {
         _controller.text = widget.category!.title;
         setState(() {
-          _priority = widget.category?.priority ?? 0;
-          _selectedColor = widget.category?.color ?? 0xFF2196F3;
+          _priority = widget.category!.priority;
+          _selectedColor = widget.category!.color;
         });
       }
       return;
     }
-
-    widget.onSave(_controller.text.trim(), _selectedColor, _priority);
+    widget.onSave(text, _selectedColor, _priority);
   }
 
   @override
@@ -69,312 +62,191 @@ class _CategoryTileState extends State<CategoryTile> {
     super.dispose();
   }
 
-  String get _priorityText {
-    switch (_priority) {
-      case 1:
-        return 'Baja';
-      case 2:
-        return 'Media';
-      case 3:
-        return 'Alta';
-      default:
-        return 'Sin prioridad';
-    }
-  }
-
-  Color get _priorityColor {
-    switch (_priority) {
-      case 1:
-        return Colors.green;
-      case 2:
-        return Colors.orange;
-      case 3:
-        return Colors.red;
-      default:
-        return Colors.grey;
-    }
-  }
+  // ── Priority helpers ──────────────────────────────────────────────────────
+  static const _priorityLabels = ['Sin prioridad', 'Baja', 'Media', 'Alta'];
+  static const _priorityColors = [
+    Color(0xFF9E9E9E),
+    Color(0xFF43A047),
+    Color(0xFFFB8C00),
+    Color(0xFFE53935),
+  ];
 
   void _togglePriority() {
     setState(() => _priority = (_priority + 1) % 4);
     _trySave();
   }
 
+  void _pickColor() {
+    showDialog(
+      context: context,
+      builder: (_) => _SimpleColorPicker(
+        initialColor: Color(_selectedColor),
+        onSelectedColor: (c) {
+          setState(() => _selectedColor = c.toARGB32());
+          _trySave();
+        },
+      ),
+    );
+  }
+
+  // ── Build ─────────────────────────────────────────────────────────────────
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final isLight = theme.brightness == Brightness.light;
+    final cs = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    final backgroundColor  = isLight
-      ? HSLColor.fromColor(Color(_selectedColor)).withLightness(0.45).toColor()
-      : HSLColor.fromColor(Color(_selectedColor)).withLightness(0.25).toColor();
+    final accent = Color(_selectedColor);
+    final hsl = HSLColor.fromColor(accent);
+    final tileBg = isDark
+        ? hsl.withLightness(0.18).withSaturation(0.35).toColor()
+        : hsl.withLightness(0.92).withSaturation(0.35).toColor();
+    final stripeColor = isDark
+        ? hsl.withLightness(0.55).toColor()
+        : hsl.withLightness(0.42).toColor();
 
-    // final backgroundColor = _selectedColor != null
-    //   ? (isLight
-    //       ? HSLColor.fromColor(Color(_selectedColor)).withLightness(0.45).toColor()
-    //       : HSLColor.fromColor(Color(_selectedColor)).withLightness(0.25).toColor())
-    //   : theme.colorScheme.surfaceContainerLowest;
+    final priorityColor = _priorityColors[_priority];
 
-
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+    Widget tile = Material(
+      color: tileBg,
+      borderRadius: BorderRadius.circular(16),
       child: TapRegion(
         onTapOutside: (_) => _focusNode.unfocus(),
-        child: _isNewCategory 
-          ? Container(
-            padding: EdgeInsetsGeometry.all(8),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(16),
-              color: backgroundColor,
-
-              border: _isNewCategory 
-                ? Border.all(color: theme.hintColor.withAlpha(50), width: 2) 
-                : null,
-            ),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      TextField(
-                        controller: _controller,
-                        focusNode: _focusNode,
-                        style: TextStyle(
-                          // color: theme.colorScheme.onSurface,
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          decoration: TextDecoration.none,
-                        ),
-                        decoration: InputDecoration(
-                          hintText: 'Nueva categoría....',
-                          hintStyle: TextStyle(color: Colors.transparent),
-                          border: InputBorder.none,
-                          isDense: true,
-                        ),
-                      ),
-      
-                      const SizedBox(height: 6),
-      
-                      GestureDetector(
-                        onTap: _togglePriority,
-                        child: AnimatedContainer(
-                          duration: const Duration(milliseconds: 200),
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 4,
-                          ),
-                          decoration: BoxDecoration(
-                            // color: theme.cardColor.withAlpha(200),
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(Icons.flag, size: 14, color: _priorityColor),
-                              const SizedBox(width: 6),
-                              Text(
-                                _priorityText,
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w500,
-                                  color: isLight
-                                    ? theme.colorScheme.onSurface
-                                    : theme.colorScheme.onInverseSurface,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-      
-      
-                    ],
-                  ),
-                ),
-      
-                GestureDetector(
-                  onTap: () {
-                    showDialog(
-                      context: context, 
-                      builder: (context) {
-                        return _SimpleColorPicker(
-                          initialColor: Color(_selectedColor),
-                          onSelectedColor: (Color nuevoColor) {
-                            setState(() {
-                              _selectedColor = nuevoColor.toARGB32();
-                            });
-                            _trySave();
-                          },
-                        );
-                      },
-                    );
-                  },
-                  child: Container(
-                    width: 24,
-                    height: 24,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Color(_selectedColor),
-                      border: Border.all(color: Colors.white60, width: 2),
-                    ),
-                  ),
-                )
-      
-              ],
-            ),
-          )
-      
-          : ClipRRect(
-            borderRadius: BorderRadius.circular(16),
-            child: Dismissible(
-                key: ValueKey(widget.category!.id), 
-                direction: DismissDirection.startToEnd,
-                background: Container(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.centerRight,
-                      end: Alignment.centerLeft,
-                      colors: [
-                        const Color.fromARGB(37, 244, 67, 54),
-                        Colors.redAccent.shade700,
-                      ],
-                      stops: const [0.4, 1.0],
-                    ),
-                  ),
-                  alignment: Alignment.centerLeft,
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: const Icon(Icons.delete, color: Colors.white,),
-                ),
-                confirmDismiss: (direction) async {
-                  if (widget.onDelete != null) {
-                    widget.onDelete!();
-                  }
-                  return false;
-                },
-                  
-                child: Container(
-                    padding: EdgeInsetsGeometry.all(8),
-                    decoration: BoxDecoration(
-                      color: backgroundColor,
-                      border: _isNewCategory 
-                        ? Border.all(color: theme.hintColor.withAlpha(50), width: 2) 
-                        : null,
-                    ),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              TextField(
-                                controller: _controller,
-                                focusNode: _focusNode,
-                                style: TextStyle(
-                                  // color: theme.colorScheme.onSurface,
-                                  color: Colors.white,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w500,
-                                  decoration: TextDecoration.none,
-                                ),
-                                decoration: InputDecoration(
-                                  hintText: 'Nueva categoría....',
-                                  hintStyle: TextStyle(color: Colors.transparent),
-                                  border: InputBorder.none,
-                                  isDense: true,
-                                ),
-                              ),
-                  
-                              const SizedBox(height: 6),
-                  
-                              GestureDetector(
-                                onTap: _togglePriority,
-                                child: AnimatedContainer(
-                                  duration: const Duration(milliseconds: 200),
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 8,
-                                    vertical: 4,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    // color: theme.cardColor.withAlpha(200),
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Icon(Icons.flag, size: 14, color: _priorityColor),
-                                      const SizedBox(width: 6),
-                                      Text(
-                                        _priorityText,
-                                        style: TextStyle(
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.w500,
-                                          color: isLight
-                                            ? theme.colorScheme.onSurface
-                                            : theme.colorScheme.onInverseSurface,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                  
-                        GestureDetector(
-                          onTap: () {
-                            showDialog(
-                              context: context, 
-                              builder: (context) {
-                                return _SimpleColorPicker(
-                                  initialColor: Color(_selectedColor),
-                                  onSelectedColor: (Color nuevoColor) {
-                                    setState(() {
-                                      _selectedColor = nuevoColor.toARGB32();
-                                    });
-                                    _trySave();
-                                  },
-                                );
-                              },
-                            );
-                          },
-                          child: Container(
-                            width: 24,
-                            height: 24,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: Color(_selectedColor),
-                              border: Border.all(color: Colors.white60, width: 2),
-                            ),
-                          ),
-                        )
-                      ],
-                    ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            // Accent stripe
+            Container(
+              width: 4,
+              height: 68,
+              decoration: BoxDecoration(
+                color: stripeColor,
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(16),
+                  bottomLeft: Radius.circular(16),
                 ),
               ),
-          ),
+            ),
+
+            const SizedBox(width: 14),
+
+            // Color dot — tap to pick
+            GestureDetector(
+              onTap: _pickColor,
+              child: Container(
+                width: 32,
+                height: 32,
+                decoration: BoxDecoration(
+                  color: accent,
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: accent.withAlpha(80),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: Icon(Icons.palette_outlined,
+                    size: 16, color: Colors.white.withAlpha(200)),
+              ),
+            ),
+
+            const SizedBox(width: 12),
+
+            // Title + priority
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextField(
+                    controller: _controller,
+                    focusNode: _focusNode,
+                    style: GoogleFonts.manrope(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                      color: isDark ? Colors.white : cs.onSurface,
+                    ),
+                    decoration: InputDecoration(
+                      hintText: 'Nombre de categoría…',
+                      hintStyle: GoogleFonts.manrope(
+                        fontSize: 15,
+                        color: (isDark ? Colors.white : cs.onSurface).withAlpha(80),
+                      ),
+                      filled: false,
+                      border: InputBorder.none,
+                      isDense: true,
+                      contentPadding: EdgeInsets.zero,
+                    ),
+                    onSubmitted: (_) => _trySave(),
+                  ),
+                  const SizedBox(height: 4),
+                  GestureDetector(
+                    onTap: _togglePriority,
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 180),
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                      decoration: BoxDecoration(
+                        color: priorityColor.withAlpha(30),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Container(
+                            width: 6,
+                            height: 6,
+                            decoration: BoxDecoration(
+                              color: priorityColor,
+                              shape: BoxShape.circle,
+                            ),
+                          ),
+                          const SizedBox(width: 5),
+                          Text(
+                            _priorityLabels[_priority],
+                            style: GoogleFonts.inter(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w600,
+                              color: priorityColor,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            // Delete (existing categories only)
+            if (!_isNew && widget.onDelete != null)
+              IconButton(
+                icon: Icon(Icons.delete_outline_rounded,
+                    color: cs.error.withAlpha(180), size: 20),
+                onPressed: widget.onDelete,
+              )
+            else
+              const SizedBox(width: 8),
+          ],
+        ),
       ),
+    );
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: tile,
     );
   }
 }
 
-
+// ─── Color Picker Dialog ──────────────────────────────────────────────────────
 class _SimpleColorPicker extends StatefulWidget {
-
   final Color initialColor;
   final Function(Color) onSelectedColor;
 
-
   const _SimpleColorPicker({
     required this.initialColor,
-    required this.onSelectedColor, 
+    required this.onSelectedColor,
   });
 
   @override
@@ -382,77 +254,73 @@ class _SimpleColorPicker extends StatefulWidget {
 }
 
 class _SimpleColorPickerState extends State<_SimpleColorPicker> {
-  
-  late Color _colorElegido;
+  late Color _picked;
 
-  final List<Color> _palette = [
-    Colors.blue, Colors.lightBlue, Colors.cyan, Colors.teal,
-    Colors.green, Colors.lightGreen, Colors.lime, Colors.yellow,
-    Colors.amber, Colors.orange, Colors.deepOrange, Colors.red,
-    Colors.pink, Colors.purple, Colors.deepPurple, Colors.indigo,
-    Colors.blueGrey, Colors.brown, Colors.grey, Colors.black87,
+  static const _palette = [
+    Color(0xFF5C6BC0), Color(0xFF3F51B5), Color(0xFF1E88E5), Color(0xFF039BE5),
+    Color(0xFF00ACC1), Color(0xFF00897B), Color(0xFF43A047), Color(0xFF7CB342),
+    Color(0xFFFDD835), Color(0xFFFB8C00), Color(0xFFF4511E), Color(0xFFE53935),
+    Color(0xFFD81B60), Color(0xFF8E24AA), Color(0xFF6D4C41), Color(0xFF546E7A),
   ];
 
   @override
   void initState() {
     super.initState();
-    _colorElegido = widget.initialColor;
+    _picked = widget.initialColor;
   }
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return AlertDialog(
-      title: const Text('Elegí un color'),
-      content: SingleChildScrollView(
-        child: Wrap(
-          spacing: 12,
-          runSpacing: 12,
-          alignment: WrapAlignment.center,
-          children: _palette.map((color) {
-            final isSelected = _colorElegido == color;
-            
-            return GestureDetector(
-              onTap: () {
-                setState(() {
-                  _colorElegido = color;
-                });
-              },
-              child: Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: color,
-                  shape: BoxShape.circle,
-                  border: isSelected 
-                      ? Border.all(color: Colors.white, width: 3)
-                      : Border.all(color: Colors.black12, width: 1),
-                  boxShadow: isSelected ? [
-                    BoxShadow(color: color.withAlpha(100), blurRadius: 8, spreadRadius: 2)
-                  ] : null,
-                ),
-                child: isSelected 
-                    ? const Icon(Icons.check, color: Colors.white, size: 20)
+      backgroundColor: isDark ? cs.surfaceContainerHigh : cs.surface,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+      title: Text(
+        'Elige un color',
+        style: GoogleFonts.manrope(fontWeight: FontWeight.w700),
+      ),
+      content: Wrap(
+        spacing: 12,
+        runSpacing: 12,
+        alignment: WrapAlignment.center,
+        children: _palette.map((c) {
+          final isSelected = _picked.toARGB32() == c.toARGB32();
+          return GestureDetector(
+            onTap: () => setState(() => _picked = c),
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 150),
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: c,
+                shape: BoxShape.circle,
+                boxShadow: isSelected
+                    ? [BoxShadow(color: c.withAlpha(120), blurRadius: 10, spreadRadius: 2)]
                     : null,
               ),
-            );
-          }).toList(),
-        ),
+              child: isSelected
+                  ? const Icon(Icons.check_rounded, color: Colors.white, size: 20)
+                  : null,
+            ),
+          );
+        }).toList(),
       ),
       actions: [
         TextButton(
-          onPressed:() {
-            Navigator.pop(context);
-          },
-          child: const Text('Cancelar', style: TextStyle(fontWeight: FontWeight.bold)),
+          onPressed: () => Navigator.pop(context),
+          child: Text('Cancelar',
+              style: GoogleFonts.inter(
+                  color: cs.onSurfaceVariant, fontWeight: FontWeight.w500)),
         ),
-        TextButton(
-          onPressed:() {
-            widget.onSelectedColor(_colorElegido);
+        FilledButton(
+          onPressed: () {
+            widget.onSelectedColor(_picked);
             Navigator.pop(context);
           },
-          child: const Text('Aceptar', style: TextStyle(fontWeight: FontWeight.bold)),
-        )
+          child: Text('Confirmar', style: GoogleFonts.inter(fontWeight: FontWeight.w600)),
+        ),
       ],
     );
   }

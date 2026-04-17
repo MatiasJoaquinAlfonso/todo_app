@@ -101,12 +101,12 @@ final appRouter = GoRouter(
         StatefulShellBranch(
           routes: [
             GoRoute(
-              path: '/categories',
+              path: '/calendar',
               builder: (context, state) {
                 return BlocProvider(
-                  create: (context) => _createCategoryBloc(context)
-                    ..add(SubscribeToCategories()),
-                  child: const CategoriesScreen(),
+                  create: (context) => _createTodoBloc(context)
+                    ..add(const TodoSubscriptionRequested(isDone: false)),
+                  child: const CalendarScreen(),
                 );
               },
             ),
@@ -123,6 +123,17 @@ final appRouter = GoRouter(
         ),        
 
       ]
+    ),
+
+    GoRoute(
+      path: '/categories',
+      builder: (context, state) {
+        return BlocProvider(
+          create: (context) => _createCategoryBloc(context)
+            ..add(SubscribeToCategories()),
+          child: const CategoriesScreen(),
+        );
+      },
     ),
 
 

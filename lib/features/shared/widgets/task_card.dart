@@ -1,260 +1,164 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 
 class TaskCard extends StatelessWidget {
-
   final String title;
   final String subTitle;
-  final double borderRadius;
-  final VoidCallback onTap;
-
-  final Color? categoryColor;
-  final String? categoryName;
-  final int? categoryPriority;
   final DateTime dateInit;
   final DateTime dateFinish;
-
-  final String? dismissKey;
+  final double borderRadius;
+  final VoidCallback onTap;
+  final Future<bool?> Function()? onSwipeLeft;
+  final Future<bool?> Function()? onSwipeRight;
   final Widget? background;
   final Widget? secondaryBackground;
-  final Future<bool?> Function()? onSwipeLeft; 
-  final Future<bool?> Function()? onSwipeRight; 
+  final String dismissKey;
+  final String? categoryName;
+  final Color? categoryColor;
+  final int? categoryPriority;
 
   const TaskCard({
-    super.key, 
-    required this.title, 
-    this.subTitle = '', 
-    required this.borderRadius, 
-    required this.onTap, 
-    this.categoryColor, 
-    this.categoryName, 
-    this.categoryPriority, 
-    required this.dateInit, 
+    super.key,
+    required this.title,
+    required this.subTitle,
+    required this.dateInit,
     required this.dateFinish,
-    this.dismissKey,
-    this.background,
-    this.secondaryBackground,
+    required this.onTap,
+    this.borderRadius = 16.0,
     this.onSwipeLeft,
     this.onSwipeRight,
+    this.background,
+    this.secondaryBackground,
+    required this.dismissKey,
+    this.categoryName,
+    this.categoryColor,
+    this.categoryPriority,
   });
-
-  String get _priorityText {
-    switch (categoryPriority) {
-      case 1:
-        return 'Baja';
-      case 2:
-        return 'Media';
-      case 3:
-        return 'Alta';
-      default:
-        return 'Sin prioridad';
-    }
-  }
-
-  Color get _priorityColor {
-    switch (categoryPriority) {
-      case 1:
-        return Colors.green;
-      case 2:
-        return Colors.orange;
-      case 3:
-        return Colors.red;
-      default:
-        return Colors.grey;
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final isLight = theme.brightness == Brightness.light;
+    final cs = Theme.of(context).colorScheme;
 
-    final backgroundColor = categoryColor != null
-      ? (isLight
-          ? HSLColor.fromColor(categoryColor!).withLightness(0.40).toColor()
-          : HSLColor.fromColor(categoryColor!).withLightness(0.25).toColor())
-      : Theme.of(context).colorScheme.surfaceContainerLowest;
-
-    Widget cardContent = Theme(
-      data: Theme.of(context).copyWith(
-        dividerColor: Colors.transparent,
-      ),
-      child: Container(
-        color: categoryColor != null
-          ? backgroundColor
-          : (isLight ? Color(0xFFFFFFFF) : theme.colorScheme.surfaceContainerLowest),
-          // : Color(0xFFFFFFFF),
-        child: ExpansionTile(
-
-          title: GestureDetector(
-            behavior: HitTestBehavior.opaque,
-            onTap: onTap,
-            child: Text(
-              title,
-              style: TextStyle(
-                // color: categoryColor != null ? Colors.white70 : theme.colorScheme.onSurface
-                fontWeight: FontWeight.bold,
-                color: theme.colorScheme.onSurface,
-              ),
-              )
-          ),
-          subtitle: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    // Build the list tile exactly as Stitch designed it
+    final inner = Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(borderRadius),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Text(
-                categoryName ?? 'Sin categoría',
-                style: TextStyle(
-                    color: theme.colorScheme.onSurface,
-                    // color: categoryColor != null 
-                    //   ? Colors.white 
-                    //   : theme.colorScheme.onSurface
-                  ),
+              // Checkbox outline mock
+              Container(
+                width: 20,
+                height: 20,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(color: cs.primary, width: 2),
                 ),
-              if (categoryPriority != null)
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    // color: theme.colorScheme.onSurface,
-                    color: Colors.white,
-                    // color: isLight
-                    //     ? Colors.white.withAlpha(210)
-                    //     : theme.colorScheme.onSurface,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(Icons.flag, size: 14, color: _priorityColor),
-                      const SizedBox(width: 6),
-                      Text(
-                        _priorityText,
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: isLight
-                            ? theme.colorScheme.onSurface
-                            : theme.colorScheme.onInverseSurface,
-                          fontWeight: FontWeight.w500,
-                        ),
+              ),
+              const SizedBox(width: 16),
+              
+              // Text Content
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      title,
+                      style: GoogleFonts.inter(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: cs.onSurface,
                       ),
-                    ],
-                  ),
-                ),
-            ],
-          ),
-
-          children: [
-            Container(
-              // color: Theme.of(context).colorScheme.surfaceContainerLowest,
-              color: backgroundColor,
-
-              width: double.infinity,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
-                child: Align(
-                  alignment: Alignment.topLeft,
-                  child: Column(
-                    children: [
-                      Row(
-                        children: [
-                          Expanded(
-                            child: ListTile(
-                              contentPadding: EdgeInsets.zero,
-                              leading: Icon(
-                                Icons.play_circle_outline_outlined,
-                                color: theme.colorScheme.onSurface,
-                                // color: categoryColor != null 
-                                //   ? Colors.white 
-                                //   : theme.colorScheme.onSurface
-                              ),
-                              title: Text(
-                                'Inicio', 
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold, 
-                                  fontSize: 14,
-                                  color: theme.colorScheme.onSurface,
-                                  // color: categoryColor != null 
-                                  //   ? Colors.white 
-                                  //   : theme.colorScheme.onSurface  
-                                )
-                              ),
-                              subtitle: Text(
-                                '${dateInit.day}/${dateInit.month}/${dateFinish.year} - ${dateInit.hour}:${dateInit.minute.toString().padLeft(2, '0')}',
-                                style: TextStyle(
-                                  color: theme.colorScheme.onSurface,
-                                  // color: categoryColor != null 
-                                  //   ? Colors.white 
-                                  //   : theme.colorScheme.onSurface 
-                                )
-                              ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 4),
+                    Row(
+                      children: [
+                        Icon(Icons.access_time_rounded, size: 10, color: cs.primary),
+                        const SizedBox(width: 4),
+                        Text(
+                          TimeOfDay.fromDateTime(dateInit).format(context),
+                          style: GoogleFonts.inter(
+                            fontSize: 10,
+                            fontWeight: FontWeight.w500,
+                            color: cs.onSurfaceVariant,
+                          ),
+                        ),
+                        if (categoryName != null) ...[
+                          const SizedBox(width: 6),
+                          Text(
+                            '•',
+                            style: GoogleFonts.inter(
+                              fontSize: 10,
+                              color: cs.onSurfaceVariant,
                             ),
                           ),
-
-                          Expanded(
-                            child: ListTile(
-                              contentPadding: EdgeInsets.zero,
-                              leading: Icon(
-                                Icons.stop_circle_outlined,
-                                // color: categoryColor != null ? Colors.white : theme.colorScheme.onSurface,
-                                color: theme.colorScheme.onSurface,
-                              ),
-                              title: Text(
-                                'Fin', 
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold, 
-                                  fontSize: 14,
-                                  // color: categoryColor != null ? Colors.white : theme.colorScheme.onSurface,
-                                  color: theme.colorScheme.onSurface,
-                                )),
-                              subtitle: Text(
-                                '${dateFinish.day}/${dateFinish.month}/${dateFinish.year} - ${dateFinish.hour}:${dateFinish.minute.toString().padLeft(2, '0')}',
-                                style: TextStyle(
-                                  // color: categoryColor != null ? Colors.white : theme.colorScheme.onSurface 
-                                  color: theme.colorScheme.onSurface,
-                                )
-                              ),
+                          const SizedBox(width: 6),
+                          Text(
+                            categoryName!.toUpperCase(),
+                            style: GoogleFonts.inter(
+                              fontSize: 9,
+                              fontWeight: FontWeight.w700,
+                              color: cs.onSurfaceVariant,
+                              letterSpacing: 0.5,
                             ),
-                          )
+                          ),
                         ],
-                      )
-                    ],
-                  ),
+                      ],
+                    ),
+                  ],
                 ),
               ),
-            )
-        
-          ],
-          
+              
+              // More options
+              Icon(
+                Icons.more_vert_rounded,
+                size: 20,
+                color: cs.onSurfaceVariant.withAlpha(150),
+              ),
+            ],
+          ),
         ),
       ),
     );
 
-    Widget finalWidget;
-
-    if (dismissKey != null && (onSwipeLeft != null || onSwipeRight != null)) {
-      finalWidget = Dismissible(
-        key: Key(dismissKey!),
-        background: background,
-        secondaryBackground: secondaryBackground,
-        confirmDismiss: (direction) async {
-          if (direction == DismissDirection.startToEnd && onSwipeRight != null) {
-            return onSwipeRight!();
-          } else if (direction == DismissDirection.endToStart && onSwipeLeft != null) {
-            return onSwipeLeft!();
-          }
-          return false;
-        },
-        child: cardContent,
+    // If swipeable, wrap in Dismissible
+    if (onSwipeLeft != null || onSwipeRight != null) {
+      return Container(
+        margin: const EdgeInsets.only(bottom: 8),
+        clipBehavior: Clip.hardEdge,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(borderRadius),
+        ),
+        child: Dismissible(
+          key: Key(dismissKey),
+          background: background ?? Container(color: cs.primaryContainer),
+          secondaryBackground: secondaryBackground ?? Container(color: cs.error),
+          confirmDismiss: (direction) async {
+            if (direction == DismissDirection.endToStart && onSwipeLeft != null) {
+              return await onSwipeLeft!();
+            } else if (direction == DismissDirection.startToEnd &&
+                onSwipeRight != null) {
+              return await onSwipeRight!();
+            }
+            return false;
+          },
+          child: inner,
+        ),
       );
-    } else {
-      finalWidget = cardContent;
     }
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4.0),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(borderRadius),
-        child: finalWidget,
-      ),
+    // Default return
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      child: inner,
     );
   }
 }
