@@ -1,5 +1,5 @@
-import 'package:todo_app/features/database/database.dart';
 import 'package:todo_app/features/todo/domain/entities/event_entity.dart';
+import 'package:todo_app/features/todo/domain/entities/notification_entity.dart';
 
 abstract class EventRepository {
 
@@ -13,9 +13,9 @@ abstract class EventRepository {
 
   Future<void> updateEvent(EventEntity event);
 
-  Future<int> addNotification(NotificationTableCompanion notification);
+  Future<int> addNotification(NotificationEntity notification);
 
-  Future<List<NotificationTableData>> getNotifications(int taskId);
+  Future<List<NotificationEntity>> getNotifications(int taskId);
 
   Future<void> deleteNotifications(int taskId);
 

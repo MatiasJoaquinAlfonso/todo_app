@@ -3,6 +3,7 @@ import 'package:todo_app/features/database/database.dart';
 import 'package:todo_app/features/todo/data/mappers/category_mapper.dart';
 import 'package:todo_app/features/todo/domain/entities/category_entity.dart';
 import 'package:todo_app/features/todo/domain/entities/event_entity.dart';
+import 'package:todo_app/features/todo/domain/entities/notification_entity.dart';
 import 'package:todo_app/features/todo/domain/repositories/event_repository.dart';
 import 'package:todo_app/features/todo/data/mappers/event_mapper.dart';
 
@@ -68,15 +69,23 @@ class EventRepositoryImpl extends EventRepository {
   }
   
   @override
-  Future<int> addNotification(NotificationTableCompanion notification) async {
-    return await db.into(db.notificationTable).insert(notification);
+  Future<int> addNotification(NotificationEntity notification) async {
+    final companion = NotificationTableCompanion(
+      eventId: Value(notification.eventId),
+      scheduleDate: Value(notification.scheduleDate),
+    );
+    return await db.into(db.notificationTable).insert(companion);
   }
   
   @override
-  Future<List<NotificationTableData>> getNotifications(int taskId) async {
+  Future<List<NotificationEntity>> getNotifications(int taskId) async {
     final query = db.select(db.notificationTable)..where((tbl) => tbl.eventId.equals(taskId));
     final result = await query.get();
-    return result;
+    return result.map((data) => NotificationEntity(
+      id: data.id,
+      eventId: data.eventId,
+      scheduleDate: data.scheduleDate,
+    )).toList();
   }
   
   @override

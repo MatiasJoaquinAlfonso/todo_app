@@ -10,7 +10,49 @@ import 'package:todo_app/features/todo/domain/repositories/event_repository.dart
 import 'package:todo_app/features/todo/presentation/bloc/categories_bloc/bloc/category_bloc.dart';
 import 'package:todo_app/features/todo/presentation/bloc/todo_bloc.dart';
 
+import 'package:todo_app/features/todo/domain/use_cases/event/get_events_usecase.dart';
+import 'package:todo_app/features/todo/domain/use_cases/event/create_event_usecase.dart';
+import 'package:todo_app/features/todo/domain/use_cases/event/update_event_usecase.dart';
+import 'package:todo_app/features/todo/domain/use_cases/event/delete_event_usecase.dart';
+import 'package:todo_app/features/todo/domain/use_cases/event/add_event_notification_usecase.dart';
+import 'package:todo_app/features/todo/domain/use_cases/event/get_event_notifications_usecase.dart';
+import 'package:todo_app/features/todo/domain/use_cases/event/delete_event_notifications_usecase.dart';
 
+import 'package:todo_app/features/todo/domain/use_cases/category/get_categories_usecase.dart';
+import 'package:todo_app/features/todo/domain/use_cases/category/create_category_usecase.dart';
+import 'package:todo_app/features/todo/domain/use_cases/category/update_category_usecase.dart';
+import 'package:todo_app/features/todo/domain/use_cases/category/delete_category_usecase.dart';
+import 'package:todo_app/features/todo/domain/use_cases/event/count_tasks_by_category_usecase.dart';
+import 'package:todo_app/features/todo/domain/use_cases/event/delete_tasks_by_category_usecase.dart';
+import 'package:todo_app/features/todo/domain/use_cases/event/remove_category_from_tasks_usecase.dart';
+
+
+TodoBloc _createTodoBloc(BuildContext context) {
+  final repo = context.read<EventRepository>();
+  return TodoBloc(
+    getEvents: GetEventsUseCase(repo),
+    createEvent: CreateEventUseCase(repo),
+    updateEvent: UpdateEventUseCase(repo),
+    deleteEvent: DeleteEventUseCase(repo),
+    addNotification: AddEventNotificationUseCase(repo),
+    getNotifications: GetEventNotificationsUseCase(repo),
+    deleteNotifications: DeleteEventNotificationsUseCase(repo),
+  );
+}
+
+CategoryBloc _createCategoryBloc(BuildContext context) {
+  final eventRepo = context.read<EventRepository>();
+  final categoryRepo = context.read<CategoryRepository>();
+  return CategoryBloc(
+    getCategories: GetCategoriesUseCase(categoryRepo),
+    createCategory: CreateCategoryUseCase(categoryRepo),
+    updateCategory: UpdateCategoryUseCase(categoryRepo),
+    deleteCategory: DeleteCategoryUseCase(categoryRepo),
+    countTasksByCategory: CountTasksByCategoryUseCase(eventRepo),
+    deleteTasksByCategory: DeleteTasksByCategoryUseCase(eventRepo),
+    removeCategoryFromTasks: RemoveCategoryFromTasksUseCase(eventRepo),
+  );
+}
 
 final appRouter = GoRouter(
   initialLocation: '/',
@@ -29,9 +71,8 @@ final appRouter = GoRouter(
               path: '/',
               builder: (context, state) {
                 return BlocProvider(
-                  create: (context) => TodoBloc(
-                    repository: context.read<EventRepository>()
-                  )..add(const TodoSubscriptionRequested(isDone: false)),
+                  create: (context) => _createTodoBloc(context)
+                    ..add(const TodoSubscriptionRequested(isDone: false)),
                   
                   child: const HomePage(),
                 );
@@ -47,9 +88,8 @@ final appRouter = GoRouter(
               path: '/task_finish',
               builder: (context, state) {
                 return BlocProvider(
-                  create: (context) => TodoBloc(
-                    repository: context.read<EventRepository>()
-                  )..add(const TodoSubscriptionRequested(isDone: true)),
+                  create: (context) => _createTodoBloc(context)
+                    ..add(const TodoSubscriptionRequested(isDone: true)),
 
                   child: const TaskFinishScreen(),
                 );
@@ -63,14 +103,9 @@ final appRouter = GoRouter(
             GoRoute(
               path: '/categories',
               builder: (context, state) {
-                final eventRepository = context.read<EventRepository>();
-                final categoryRepository = context.read<CategoryRepository>();
-
                 return BlocProvider(
-                  create: (context) => CategoryBloc(
-                    eventRepository: eventRepository, 
-                    categoryRepository: categoryRepository
-                  )..add(SubscribeToCategories()),
+                  create: (context) => _createCategoryBloc(context)
+                    ..add(SubscribeToCategories()),
                   child: const CategoriesScreen(),
                 );
               },
@@ -102,15 +137,11 @@ final appRouter = GoRouter(
           child: MultiBlocProvider(
             providers: [
               BlocProvider(
-                create: (context) => TodoBloc(
-                  repository: context.read<EventRepository>()
-                ),
+                create: (context) => _createTodoBloc(context),
               ),
               BlocProvider(
-                create: (context) => CategoryBloc(
-                  eventRepository: context.read<EventRepository>(), 
-                  categoryRepository: context.read<CategoryRepository>()
-                )..add(SubscribeToCategories()),
+                create: (context) => _createCategoryBloc(context)
+                  ..add(SubscribeToCategories()),
               ),
             ],
             child: TaskScreen(event: taskToEdit),
