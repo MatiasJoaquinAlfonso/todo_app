@@ -13,13 +13,12 @@ import 'package:todo_app/features/todo/presentation/cubit/theme_cubit/theme_cubi
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await PreferencesService.init();
 
   final NotificationService notificationService = NotificationService();
   await notificationService.init();
-  //Apenas iniciamos la app solicitamos los permisos.
+
   notificationService.requestPermissions();
-  
-  await PreferencesService.init();
 
   final db = AppDatabase();
 
@@ -36,25 +35,27 @@ class MyApp extends StatelessWidget {
     return MultiRepositoryProvider(
       providers: [
         RepositoryProvider<EventRepository>(
-          create: (context) => EventRepositoryImpl(db: db),   
+          create: (context) => EventRepositoryImpl(db: db),
         ),
 
         RepositoryProvider<CategoryRepository>(
           create: (context) => CategoryRepositoryImpl(db: db),
-        )
+        ),
       ],
-      
+
       child: BlocProvider(
         create: (context) => ThemeCubit(),
         child: BlocBuilder<ThemeCubit, ThemeState>(
           builder: (context, state) {
-
             return MaterialApp.router(
               debugShowCheckedModeBanner: false,
               title: 'To-Do App',
               routerConfig: appRouter,
               theme: AppTheme(isDarkMode: false, selectedColor: 0).getTheme(),
-              darkTheme: AppTheme(isDarkMode: true, selectedColor: 0).getTheme(),
+              darkTheme: AppTheme(
+                isDarkMode: true,
+                selectedColor: 0,
+              ).getTheme(),
               themeMode: state.themeMode,
             );
           },
@@ -63,32 +64,3 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-
-
-// class MyApp extends StatelessWidget {
-//   final AppDatabase db;
-
-//   const MyApp({super.key, required this.db});
-
-//   @override
-//   Widget build(BuildContext context) {
-    
-//     return RepositoryProvider<EventRepository>(
-//       create: (context) => EventRepositoryImpl(db: db),
-//       child: BlocProvider(
-//         create: (context) {
-//           final repository = context.read<EventRepository>();
-//           return TodoBloc(repository: repository)
-//             ..add(TodoSubscriptionRequested());
-//         },
-//         child: MaterialApp.router(
-//           debugShowCheckedModeBanner: false,
-//           title: 'To-Do App',
-//           theme: AppTheme(isDarkMode: true, selectedColor: 0).getTheme(),
-//           routerConfig: appRouter,
-//           // home: HomePage(),
-//         ),
-//       ),
-//     );
-//   }
-// }

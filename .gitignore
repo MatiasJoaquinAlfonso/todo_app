@@ -12,6 +12,12 @@
 .swiftpm/
 migrate_working_dir/
 
+mcp_config.json
+mcp.json
+.antigravity/
+.agents/
+
+
 # IntelliJ related
 *.iml
 *.ipr

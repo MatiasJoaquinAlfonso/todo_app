@@ -124,6 +124,7 @@
 				9740EEB21CF90195004384FC /* Debug.xcconfig */,
 				7AFA3C8E1D35360C0083082E /* Release.xcconfig */,
 				9740EEB31CF90195004384FC /* Generated.xcconfig */,
+				97C146EF1CF9000F007C117D /* Products */,
 			);
 			name = Flutter;
 			sourceTree = "<group>";
@@ -133,7 +134,6 @@
 			children = (
 				9740EEB11CF90186004384FC /* Flutter */,
 				97C146F01CF9000F007C117D /* Runner */,
-				97C146EF1CF9000F007C117D /* Products */,
 				331C8082294A63A400263BE5 /* RunnerTests */,
 				6502D268D85F76AC44CAF02A /* Pods */,
 				8FE262D2C3EE4C525CCC6D13 /* Frameworks */,
