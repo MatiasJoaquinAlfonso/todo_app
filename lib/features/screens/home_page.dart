@@ -194,7 +194,7 @@ class _HomePageState extends State<HomePage> {
                                   dateFinish: task.dateFinish,
                                   borderRadius: 16,
                                   categoryName: task.category?.title,
-                                  categoryPriority: task.category?.priority,
+                                  taskPriority: task.priority,
                                   categoryColor: task.category != null
                                       ? Color(task.category!.color)
                                       : null,

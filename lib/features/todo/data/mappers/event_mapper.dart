@@ -15,6 +15,7 @@ extension EventMapper on Event {
       dateFinish: dateFinish,
       isAllDay: isAllDay,
       color: color,
+      priority: priority,
       isDone: isDone,
       category: category
     );
@@ -33,6 +34,7 @@ extension EventEntityMapper on EventEntity {
       dateFinish: Value(dateFinish),
       isAllDay: Value(isAllDay),
       color: Value(color),
+      priority: Value(priority),
       isDone: Value(isDone),
     );
   }

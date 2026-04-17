@@ -16,7 +16,7 @@ class TaskCard extends StatelessWidget {
   final String dismissKey;
   final String? categoryName;
   final Color? categoryColor;
-  final int? categoryPriority;
+  final int? taskPriority;
 
   const TaskCard({
     super.key,
@@ -33,7 +33,7 @@ class TaskCard extends StatelessWidget {
     required this.dismissKey,
     this.categoryName,
     this.categoryColor,
-    this.categoryPriority,
+    this.taskPriority,
   });
 
   @override

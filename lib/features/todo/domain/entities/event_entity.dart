@@ -13,6 +13,7 @@ class EventEntity extends Equatable {
   final bool isAllDay;
   final bool isDone;
   final int? color;
+  final int priority;
   final CategoryEntity? category;
 
   const EventEntity({ 
@@ -25,6 +26,7 @@ class EventEntity extends Equatable {
     this.isAllDay = false,
     this.isDone = false,
     this.color, 
+    this.priority = 1,
     this.category,
   });
 
@@ -38,6 +40,7 @@ class EventEntity extends Equatable {
     bool? isAllDay,
     bool? isDone,
     int? color,
+    int? priority,
     CategoryEntity? category,
   }) {
     return EventEntity(
@@ -50,10 +53,11 @@ class EventEntity extends Equatable {
       isAllDay: isAllDay ?? this.isAllDay,
       isDone: isDone ?? this.isDone,
       color: color ?? this.color,
+      priority: priority ?? this.priority,
       category: category ?? this.category,
     );
   }
   
   @override
-  List<Object?> get props => [id, title, subTitle, description, dateInit, dateFinish, isAllDay, isDone, color, category];
+  List<Object?> get props => [id, title, subTitle, description, dateInit, dateFinish, isAllDay, isDone, color, priority, category];
 }

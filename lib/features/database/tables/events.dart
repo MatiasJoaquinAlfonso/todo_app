@@ -15,6 +15,7 @@ class Events extends Table {
   BoolColumn get isAllDay => boolean().withDefault(const Constant(false))();
   BoolColumn get isDone => boolean().withDefault(const Constant(false))();
   IntColumn get color => integer().nullable()();
+  IntColumn get priority => integer().withDefault(const Constant(1))();
 
   IntColumn get fkCategoryID => integer().nullable().references(CategoriesTable, #id)();
 }

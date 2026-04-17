@@ -183,7 +183,7 @@ class TaskFinishScreen extends StatelessWidget {
                             dateFinish: task.dateFinish,
                             borderRadius: 24,
                             categoryName: task.category?.title,
-                            categoryPriority: task.category?.priority,
+                            taskPriority: task.priority,
                             categoryColor: task.category != null
                                 ? Color(task.category!.color)
                                 : null,

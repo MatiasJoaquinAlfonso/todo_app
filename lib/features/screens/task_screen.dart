@@ -27,6 +27,7 @@ class _TaskScreenState extends State<TaskScreen> {
   bool get _isEditing => widget.event != null;
   final bool _shouldSave = true;
   bool _isAllDay = false;
+  int _priority = 1;
   CategoryEntity? _selectedCategory;
 
   @override
@@ -38,6 +39,7 @@ class _TaskScreenState extends State<TaskScreen> {
       _dateInit = widget.event!.dateInit;
       _dateFinish = widget.event!.dateFinish;
       _isAllDay = widget.event!.isAllDay;
+      _priority = widget.event!.priority;
       _timeInit = TimeOfDay.fromDateTime(widget.event!.dateInit);
       _timeFinish = TimeOfDay.fromDateTime(widget.event!.dateFinish);
       _selectedCategory = widget.event?.category;
@@ -52,7 +54,7 @@ class _TaskScreenState extends State<TaskScreen> {
   }
 
   // ── Date / Time pickers ──────────────────────────────────────────────────
-  Future<void> _pickDate() async {
+  Future<void> _pickDateInit() async {
     final picked = await showDatePicker(
       context: context,
       initialDate: _dateInit,
@@ -62,12 +64,28 @@ class _TaskScreenState extends State<TaskScreen> {
     if (picked != null) {
       setState(() {
         _dateInit = picked;
+        if (_dateFinish.isBefore(_dateInit)) {
+          _dateFinish = picked;
+        }
+      });
+    }
+  }
+
+  Future<void> _pickDateFinish() async {
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: _dateFinish.isBefore(_dateInit) ? _dateInit : _dateFinish,
+      firstDate: _dateInit,
+      lastDate: DateTime(2100),
+    );
+    if (picked != null) {
+      setState(() {
         _dateFinish = picked;
       });
     }
   }
 
-  Future<void> _pickTime() async {
+  Future<void> _pickTimeInit() async {
     final picked = await showTimePicker(
       context: context,
       initialTime: _timeInit,
@@ -75,7 +93,18 @@ class _TaskScreenState extends State<TaskScreen> {
     if (picked != null) {
       setState(() {
         _timeInit = picked;
-        _timeFinish = picked; // fallback
+      });
+    }
+  }
+
+  Future<void> _pickTimeFinish() async {
+    final picked = await showTimePicker(
+      context: context,
+      initialTime: _timeFinish,
+    );
+    if (picked != null) {
+      setState(() {
+        _timeFinish = picked;
       });
     }
   }
@@ -117,6 +146,7 @@ class _TaskScreenState extends State<TaskScreen> {
         dateInit: finalDateInit,
         dateFinish: finalDateFinish,
         isAllDay: _isAllDay,
+        priority: _priority,
         category: _selectedCategory,
       );
       context.read<TodoBloc>().add(TodoUpdated(updated));
@@ -128,6 +158,7 @@ class _TaskScreenState extends State<TaskScreen> {
         dateFinish: finalDateFinish,
         isAllDay: _isAllDay,
         isDone: false,
+        priority: _priority,
         category: _selectedCategory,
       );
       context.read<TodoBloc>().add(TodoAdded(newTask));
@@ -279,23 +310,57 @@ class _TaskScreenState extends State<TaskScreen> {
                     ),
                     const SizedBox(height: 24),
 
-                    // Date row
-                    _ActionRow(
-                      icon: Icons.calendar_today_rounded,
-                      label: 'FECHA',
-                      value: '${_dateInit.day.toString().padLeft(2, '0')}/${_dateInit.month.toString().padLeft(2, '0')}/${_dateInit.year}',
-                      onTap: _pickDate,
-                      cs: cs,
-                    ),
+                    // Prioridad
+                    _SectionLabel('Prioridad', cs),
                     const SizedBox(height: 12),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: [
+                        _CategoryChip(
+                          label: 'Baja',
+                          isSelected: _priority == 0,
+                          color: const Color(0xFF64B5F6),
+                          onTap: () => setState(() => _priority = 0)),
+                        _CategoryChip(
+                          label: 'Normal',
+                          isSelected: _priority == 1,
+                          color: const Color(0xFF81C784),
+                          onTap: () => setState(() => _priority = 1)),
+                        _CategoryChip(
+                          label: 'Alta',
+                          isSelected: _priority == 2,
+                          color: const Color(0xFFE57373),
+                          onTap: () => setState(() => _priority = 2)),
+                      ],
+                    ),
+                    const SizedBox(height: 24),
 
-                    // Time row
-                    _ActionRow(
-                      icon: Icons.access_time_rounded,
-                      label: 'HORA',
-                      value: _timeInit.format(context),
-                      onTap: _pickTime,
-                      cs: cs,
+                    // Date & Time Grid
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _DateTimeBentoCard(
+                            title: 'INICIO',
+                            dateText: '${_dateInit.day.toString().padLeft(2, '0')}/${_dateInit.month.toString().padLeft(2, '0')}/${_dateInit.year}',
+                            timeText: _timeInit.format(context),
+                            onDateTap: _pickDateInit,
+                            onTimeTap: _pickTimeInit,
+                            cs: cs,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: _DateTimeBentoCard(
+                            title: 'FIN',
+                            dateText: '${_dateFinish.day.toString().padLeft(2, '0')}/${_dateFinish.month.toString().padLeft(2, '0')}/${_dateFinish.year}',
+                            timeText: _timeFinish.format(context),
+                            onDateTap: _pickDateFinish,
+                            onTimeTap: _pickTimeFinish,
+                            cs: cs,
+                          ),
+                        ),
+                      ],
                     ),
                     const SizedBox(height: 12),
 
@@ -461,6 +526,79 @@ class _ActionRow extends StatelessWidget {
               Icon(Icons.chevron_right_rounded, size: 20, color: cs.onSurfaceVariant),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _DateTimeBentoCard extends StatelessWidget {
+  final String title;
+  final String dateText;
+  final String timeText;
+  final VoidCallback onDateTap;
+  final VoidCallback onTimeTap;
+  final ColorScheme cs;
+
+  const _DateTimeBentoCard({
+    required this.title,
+    required this.dateText,
+    required this.timeText,
+    required this.onDateTap,
+    required this.onTimeTap,
+    required this.cs,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: cs.surfaceContainerLow,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.calendar_today_rounded, size: 14, color: cs.primary),
+              const SizedBox(width: 6),
+              Text(
+                title,
+                style: GoogleFonts.manrope(
+                  fontSize: 10,
+                  fontWeight: FontWeight.w700,
+                  color: cs.onSurfaceVariant,
+                  letterSpacing: 0.5,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          InkWell(
+            onTap: onDateTap,
+            child: Text(
+              dateText,
+              style: GoogleFonts.inter(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                color: cs.onSurface,
+              ),
+            ),
+          ),
+          const SizedBox(height: 4),
+          InkWell(
+            onTap: onTimeTap,
+            child: Text(
+              timeText,
+              style: GoogleFonts.inter(
+                fontSize: 13,
+                fontWeight: FontWeight.w500,
+                color: cs.onSurfaceVariant,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

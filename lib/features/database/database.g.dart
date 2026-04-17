@@ -418,6 +418,18 @@ class $EventsTable extends Events with TableInfo<$EventsTable, Event> {
     type: DriftSqlType.int,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _priorityMeta = const VerificationMeta(
+    'priority',
+  );
+  @override
+  late final GeneratedColumn<int> priority = GeneratedColumn<int>(
+    'priority',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(1),
+  );
   static const VerificationMeta _fkCategoryIDMeta = const VerificationMeta(
     'fkCategoryID',
   );
@@ -443,6 +455,7 @@ class $EventsTable extends Events with TableInfo<$EventsTable, Event> {
     isAllDay,
     isDone,
     color,
+    priority,
     fkCategoryID,
   ];
   @override
@@ -517,6 +530,12 @@ class $EventsTable extends Events with TableInfo<$EventsTable, Event> {
         color.isAcceptableOrUnknown(data['color']!, _colorMeta),
       );
     }
+    if (data.containsKey('priority')) {
+      context.handle(
+        _priorityMeta,
+        priority.isAcceptableOrUnknown(data['priority']!, _priorityMeta),
+      );
+    }
     if (data.containsKey('fk_category_i_d')) {
       context.handle(
         _fkCategoryIDMeta,
@@ -571,6 +590,10 @@ class $EventsTable extends Events with TableInfo<$EventsTable, Event> {
         DriftSqlType.int,
         data['${effectivePrefix}color'],
       ),
+      priority: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}priority'],
+      )!,
       fkCategoryID: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
         data['${effectivePrefix}fk_category_i_d'],
@@ -594,6 +617,7 @@ class Event extends DataClass implements Insertable<Event> {
   final bool isAllDay;
   final bool isDone;
   final int? color;
+  final int priority;
   final int? fkCategoryID;
   const Event({
     required this.id,
@@ -605,6 +629,7 @@ class Event extends DataClass implements Insertable<Event> {
     required this.isAllDay,
     required this.isDone,
     this.color,
+    required this.priority,
     this.fkCategoryID,
   });
   @override
@@ -625,6 +650,7 @@ class Event extends DataClass implements Insertable<Event> {
     if (!nullToAbsent || color != null) {
       map['color'] = Variable<int>(color);
     }
+    map['priority'] = Variable<int>(priority);
     if (!nullToAbsent || fkCategoryID != null) {
       map['fk_category_i_d'] = Variable<int>(fkCategoryID);
     }
@@ -648,6 +674,7 @@ class Event extends DataClass implements Insertable<Event> {
       color: color == null && nullToAbsent
           ? const Value.absent()
           : Value(color),
+      priority: Value(priority),
       fkCategoryID: fkCategoryID == null && nullToAbsent
           ? const Value.absent()
           : Value(fkCategoryID),
@@ -669,6 +696,7 @@ class Event extends DataClass implements Insertable<Event> {
       isAllDay: serializer.fromJson<bool>(json['isAllDay']),
       isDone: serializer.fromJson<bool>(json['isDone']),
       color: serializer.fromJson<int?>(json['color']),
+      priority: serializer.fromJson<int>(json['priority']),
       fkCategoryID: serializer.fromJson<int?>(json['fkCategoryID']),
     );
   }
@@ -685,6 +713,7 @@ class Event extends DataClass implements Insertable<Event> {
       'isAllDay': serializer.toJson<bool>(isAllDay),
       'isDone': serializer.toJson<bool>(isDone),
       'color': serializer.toJson<int?>(color),
+      'priority': serializer.toJson<int>(priority),
       'fkCategoryID': serializer.toJson<int?>(fkCategoryID),
     };
   }
@@ -699,6 +728,7 @@ class Event extends DataClass implements Insertable<Event> {
     bool? isAllDay,
     bool? isDone,
     Value<int?> color = const Value.absent(),
+    int? priority,
     Value<int?> fkCategoryID = const Value.absent(),
   }) => Event(
     id: id ?? this.id,
@@ -710,6 +740,7 @@ class Event extends DataClass implements Insertable<Event> {
     isAllDay: isAllDay ?? this.isAllDay,
     isDone: isDone ?? this.isDone,
     color: color.present ? color.value : this.color,
+    priority: priority ?? this.priority,
     fkCategoryID: fkCategoryID.present ? fkCategoryID.value : this.fkCategoryID,
   );
   Event copyWithCompanion(EventsCompanion data) {
@@ -727,6 +758,7 @@ class Event extends DataClass implements Insertable<Event> {
       isAllDay: data.isAllDay.present ? data.isAllDay.value : this.isAllDay,
       isDone: data.isDone.present ? data.isDone.value : this.isDone,
       color: data.color.present ? data.color.value : this.color,
+      priority: data.priority.present ? data.priority.value : this.priority,
       fkCategoryID: data.fkCategoryID.present
           ? data.fkCategoryID.value
           : this.fkCategoryID,
@@ -745,6 +777,7 @@ class Event extends DataClass implements Insertable<Event> {
           ..write('isAllDay: $isAllDay, ')
           ..write('isDone: $isDone, ')
           ..write('color: $color, ')
+          ..write('priority: $priority, ')
           ..write('fkCategoryID: $fkCategoryID')
           ..write(')'))
         .toString();
@@ -761,6 +794,7 @@ class Event extends DataClass implements Insertable<Event> {
     isAllDay,
     isDone,
     color,
+    priority,
     fkCategoryID,
   );
   @override
@@ -776,6 +810,7 @@ class Event extends DataClass implements Insertable<Event> {
           other.isAllDay == this.isAllDay &&
           other.isDone == this.isDone &&
           other.color == this.color &&
+          other.priority == this.priority &&
           other.fkCategoryID == this.fkCategoryID);
 }
 
@@ -789,6 +824,7 @@ class EventsCompanion extends UpdateCompanion<Event> {
   final Value<bool> isAllDay;
   final Value<bool> isDone;
   final Value<int?> color;
+  final Value<int> priority;
   final Value<int?> fkCategoryID;
   const EventsCompanion({
     this.id = const Value.absent(),
@@ -800,6 +836,7 @@ class EventsCompanion extends UpdateCompanion<Event> {
     this.isAllDay = const Value.absent(),
     this.isDone = const Value.absent(),
     this.color = const Value.absent(),
+    this.priority = const Value.absent(),
     this.fkCategoryID = const Value.absent(),
   });
   EventsCompanion.insert({
@@ -812,6 +849,7 @@ class EventsCompanion extends UpdateCompanion<Event> {
     this.isAllDay = const Value.absent(),
     this.isDone = const Value.absent(),
     this.color = const Value.absent(),
+    this.priority = const Value.absent(),
     this.fkCategoryID = const Value.absent(),
   }) : title = Value(title),
        dateInit = Value(dateInit),
@@ -826,6 +864,7 @@ class EventsCompanion extends UpdateCompanion<Event> {
     Expression<bool>? isAllDay,
     Expression<bool>? isDone,
     Expression<int>? color,
+    Expression<int>? priority,
     Expression<int>? fkCategoryID,
   }) {
     return RawValuesInsertable({
@@ -838,6 +877,7 @@ class EventsCompanion extends UpdateCompanion<Event> {
       if (isAllDay != null) 'is_all_day': isAllDay,
       if (isDone != null) 'is_done': isDone,
       if (color != null) 'color': color,
+      if (priority != null) 'priority': priority,
       if (fkCategoryID != null) 'fk_category_i_d': fkCategoryID,
     });
   }
@@ -852,6 +892,7 @@ class EventsCompanion extends UpdateCompanion<Event> {
     Value<bool>? isAllDay,
     Value<bool>? isDone,
     Value<int?>? color,
+    Value<int>? priority,
     Value<int?>? fkCategoryID,
   }) {
     return EventsCompanion(
@@ -864,6 +905,7 @@ class EventsCompanion extends UpdateCompanion<Event> {
       isAllDay: isAllDay ?? this.isAllDay,
       isDone: isDone ?? this.isDone,
       color: color ?? this.color,
+      priority: priority ?? this.priority,
       fkCategoryID: fkCategoryID ?? this.fkCategoryID,
     );
   }
@@ -898,6 +940,9 @@ class EventsCompanion extends UpdateCompanion<Event> {
     if (color.present) {
       map['color'] = Variable<int>(color.value);
     }
+    if (priority.present) {
+      map['priority'] = Variable<int>(priority.value);
+    }
     if (fkCategoryID.present) {
       map['fk_category_i_d'] = Variable<int>(fkCategoryID.value);
     }
@@ -916,6 +961,7 @@ class EventsCompanion extends UpdateCompanion<Event> {
           ..write('isAllDay: $isAllDay, ')
           ..write('isDone: $isDone, ')
           ..write('color: $color, ')
+          ..write('priority: $priority, ')
           ..write('fkCategoryID: $fkCategoryID')
           ..write(')'))
         .toString();
@@ -1520,6 +1566,7 @@ typedef $$EventsTableCreateCompanionBuilder =
       Value<bool> isAllDay,
       Value<bool> isDone,
       Value<int?> color,
+      Value<int> priority,
       Value<int?> fkCategoryID,
     });
 typedef $$EventsTableUpdateCompanionBuilder =
@@ -1533,6 +1580,7 @@ typedef $$EventsTableUpdateCompanionBuilder =
       Value<bool> isAllDay,
       Value<bool> isDone,
       Value<int?> color,
+      Value<int> priority,
       Value<int?> fkCategoryID,
     });
 
@@ -1641,6 +1689,11 @@ class $$EventsTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
+  ColumnFilters<int> get priority => $composableBuilder(
+    column: $table.priority,
+    builder: (column) => ColumnFilters(column),
+  );
+
   $$CategoriesTableTableFilterComposer get fkCategoryID {
     final $$CategoriesTableTableFilterComposer composer = $composerBuilder(
       composer: this,
@@ -1744,6 +1797,11 @@ class $$EventsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<int> get priority => $composableBuilder(
+    column: $table.priority,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   $$CategoriesTableTableOrderingComposer get fkCategoryID {
     final $$CategoriesTableTableOrderingComposer composer = $composerBuilder(
       composer: this,
@@ -1807,6 +1865,9 @@ class $$EventsTableAnnotationComposer
 
   GeneratedColumn<int> get color =>
       $composableBuilder(column: $table.color, builder: (column) => column);
+
+  GeneratedColumn<int> get priority =>
+      $composableBuilder(column: $table.priority, builder: (column) => column);
 
   $$CategoriesTableTableAnnotationComposer get fkCategoryID {
     final $$CategoriesTableTableAnnotationComposer composer = $composerBuilder(
@@ -1898,6 +1959,7 @@ class $$EventsTableTableManager
                 Value<bool> isAllDay = const Value.absent(),
                 Value<bool> isDone = const Value.absent(),
                 Value<int?> color = const Value.absent(),
+                Value<int> priority = const Value.absent(),
                 Value<int?> fkCategoryID = const Value.absent(),
               }) => EventsCompanion(
                 id: id,
@@ -1909,6 +1971,7 @@ class $$EventsTableTableManager
                 isAllDay: isAllDay,
                 isDone: isDone,
                 color: color,
+                priority: priority,
                 fkCategoryID: fkCategoryID,
               ),
           createCompanionCallback:
@@ -1922,6 +1985,7 @@ class $$EventsTableTableManager
                 Value<bool> isAllDay = const Value.absent(),
                 Value<bool> isDone = const Value.absent(),
                 Value<int?> color = const Value.absent(),
+                Value<int> priority = const Value.absent(),
                 Value<int?> fkCategoryID = const Value.absent(),
               }) => EventsCompanion.insert(
                 id: id,
@@ -1933,6 +1997,7 @@ class $$EventsTableTableManager
                 isAllDay: isAllDay,
                 isDone: isDone,
                 color: color,
+                priority: priority,
                 fkCategoryID: fkCategoryID,
               ),
           withReferenceMapper: (p0) => p0
