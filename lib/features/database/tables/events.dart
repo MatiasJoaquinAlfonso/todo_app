@@ -18,4 +18,12 @@ class Events extends Table {
   IntColumn get priority => integer().withDefault(const Constant(1))();
 
   IntColumn get fkCategoryID => integer().nullable().references(CategoriesTable, #id)();
+  
+  // Google Calendar Sync
+  TextColumn get googleEventId => text().nullable()();
+  BoolColumn get isSynced => boolean().withDefault(const Constant(false))();
+  DateTimeColumn get lastSyncedAt => dateTime().nullable()();
+  TextColumn get syncStatus => textEnum<SyncStatus>().nullable()();
 }
+
+enum SyncStatus { pending, synced, conflict, error }

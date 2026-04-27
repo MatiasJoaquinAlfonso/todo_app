@@ -29,6 +29,7 @@ class _TaskScreenState extends State<TaskScreen> {
   bool _isAllDay = false;
   int _priority = 1;
   CategoryEntity? _selectedCategory;
+  bool _syncWithGoogle = false;
 
   @override
   void initState() {
@@ -160,6 +161,7 @@ class _TaskScreenState extends State<TaskScreen> {
         isDone: false,
         priority: _priority,
         category: _selectedCategory,
+        isSynced: _syncWithGoogle,
       );
       context.read<TodoBloc>().add(TodoAdded(newTask));
     }
@@ -372,6 +374,56 @@ class _TaskScreenState extends State<TaskScreen> {
                       onTap: () {},
                       cs: cs,
                       showCaret: true,
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Google Sync
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: cs.surfaceContainerLow,
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(Icons.calendar_today_rounded, size: 20, color: cs.primary),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'GOOGLE CALENDAR',
+                                  style: GoogleFonts.manrope(
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w700,
+                                    color: cs.onSurfaceVariant,
+                                    letterSpacing: 0.5,
+                                  ),
+                                ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  'Sincronizar evento',
+                                  style: GoogleFonts.inter(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w600,
+                                    color: cs.primary,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Switch(
+                            value: _syncWithGoogle,
+                            activeColor: cs.primary,
+                            onChanged: (value) {
+                              setState(() {
+                                _syncWithGoogle = value;
+                              });
+                            },
+                          ),
+                        ],
+                      ),
                     ),
                     const SizedBox(height: 32),
 

@@ -14,7 +14,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
   @override
-  int get schemaVersion => 4;
+  int get schemaVersion => 5;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -95,6 +95,14 @@ class AppDatabase extends _$AppDatabase {
       if (from < 4) {
         // Añadimos retroactivamente el nuevo campo `priority` a las notas ya existentes
         await m.addColumn(events, events.priority);
+      }
+
+      if (from < 5) {
+        // Campos para la sincronización con Google Calendar
+        await m.addColumn(events, events.googleEventId);
+        await m.addColumn(events, events.isSynced);
+        await m.addColumn(events, events.lastSyncedAt);
+        await m.addColumn(events, events.syncStatus);
       }
     },
 

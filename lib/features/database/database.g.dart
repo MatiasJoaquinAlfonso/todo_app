@@ -444,6 +444,52 @@ class $EventsTable extends Events with TableInfo<$EventsTable, Event> {
       'REFERENCES categories_table (id)',
     ),
   );
+  static const VerificationMeta _googleEventIdMeta = const VerificationMeta(
+    'googleEventId',
+  );
+  @override
+  late final GeneratedColumn<String> googleEventId = GeneratedColumn<String>(
+    'google_event_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _isSyncedMeta = const VerificationMeta(
+    'isSynced',
+  );
+  @override
+  late final GeneratedColumn<bool> isSynced = GeneratedColumn<bool>(
+    'is_synced',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("is_synced" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _lastSyncedAtMeta = const VerificationMeta(
+    'lastSyncedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> lastSyncedAt = GeneratedColumn<DateTime>(
+    'last_synced_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  @override
+  late final GeneratedColumnWithTypeConverter<SyncStatus?, String> syncStatus =
+      GeneratedColumn<String>(
+        'sync_status',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      ).withConverter<SyncStatus?>($EventsTable.$convertersyncStatusn);
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -457,6 +503,10 @@ class $EventsTable extends Events with TableInfo<$EventsTable, Event> {
     color,
     priority,
     fkCategoryID,
+    googleEventId,
+    isSynced,
+    lastSyncedAt,
+    syncStatus,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -545,6 +595,30 @@ class $EventsTable extends Events with TableInfo<$EventsTable, Event> {
         ),
       );
     }
+    if (data.containsKey('google_event_id')) {
+      context.handle(
+        _googleEventIdMeta,
+        googleEventId.isAcceptableOrUnknown(
+          data['google_event_id']!,
+          _googleEventIdMeta,
+        ),
+      );
+    }
+    if (data.containsKey('is_synced')) {
+      context.handle(
+        _isSyncedMeta,
+        isSynced.isAcceptableOrUnknown(data['is_synced']!, _isSyncedMeta),
+      );
+    }
+    if (data.containsKey('last_synced_at')) {
+      context.handle(
+        _lastSyncedAtMeta,
+        lastSyncedAt.isAcceptableOrUnknown(
+          data['last_synced_at']!,
+          _lastSyncedAtMeta,
+        ),
+      );
+    }
     return context;
   }
 
@@ -598,6 +672,24 @@ class $EventsTable extends Events with TableInfo<$EventsTable, Event> {
         DriftSqlType.int,
         data['${effectivePrefix}fk_category_i_d'],
       ),
+      googleEventId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}google_event_id'],
+      ),
+      isSynced: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}is_synced'],
+      )!,
+      lastSyncedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}last_synced_at'],
+      ),
+      syncStatus: $EventsTable.$convertersyncStatusn.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}sync_status'],
+        ),
+      ),
     );
   }
 
@@ -605,6 +697,11 @@ class $EventsTable extends Events with TableInfo<$EventsTable, Event> {
   $EventsTable createAlias(String alias) {
     return $EventsTable(attachedDatabase, alias);
   }
+
+  static JsonTypeConverter2<SyncStatus, String, String> $convertersyncStatus =
+      const EnumNameConverter<SyncStatus>(SyncStatus.values);
+  static JsonTypeConverter2<SyncStatus?, String?, String?>
+  $convertersyncStatusn = JsonTypeConverter2.asNullable($convertersyncStatus);
 }
 
 class Event extends DataClass implements Insertable<Event> {
@@ -619,6 +716,10 @@ class Event extends DataClass implements Insertable<Event> {
   final int? color;
   final int priority;
   final int? fkCategoryID;
+  final String? googleEventId;
+  final bool isSynced;
+  final DateTime? lastSyncedAt;
+  final SyncStatus? syncStatus;
   const Event({
     required this.id,
     required this.title,
@@ -631,6 +732,10 @@ class Event extends DataClass implements Insertable<Event> {
     this.color,
     required this.priority,
     this.fkCategoryID,
+    this.googleEventId,
+    required this.isSynced,
+    this.lastSyncedAt,
+    this.syncStatus,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -653,6 +758,18 @@ class Event extends DataClass implements Insertable<Event> {
     map['priority'] = Variable<int>(priority);
     if (!nullToAbsent || fkCategoryID != null) {
       map['fk_category_i_d'] = Variable<int>(fkCategoryID);
+    }
+    if (!nullToAbsent || googleEventId != null) {
+      map['google_event_id'] = Variable<String>(googleEventId);
+    }
+    map['is_synced'] = Variable<bool>(isSynced);
+    if (!nullToAbsent || lastSyncedAt != null) {
+      map['last_synced_at'] = Variable<DateTime>(lastSyncedAt);
+    }
+    if (!nullToAbsent || syncStatus != null) {
+      map['sync_status'] = Variable<String>(
+        $EventsTable.$convertersyncStatusn.toSql(syncStatus),
+      );
     }
     return map;
   }
@@ -678,6 +795,16 @@ class Event extends DataClass implements Insertable<Event> {
       fkCategoryID: fkCategoryID == null && nullToAbsent
           ? const Value.absent()
           : Value(fkCategoryID),
+      googleEventId: googleEventId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(googleEventId),
+      isSynced: Value(isSynced),
+      lastSyncedAt: lastSyncedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(lastSyncedAt),
+      syncStatus: syncStatus == null && nullToAbsent
+          ? const Value.absent()
+          : Value(syncStatus),
     );
   }
 
@@ -698,6 +825,12 @@ class Event extends DataClass implements Insertable<Event> {
       color: serializer.fromJson<int?>(json['color']),
       priority: serializer.fromJson<int>(json['priority']),
       fkCategoryID: serializer.fromJson<int?>(json['fkCategoryID']),
+      googleEventId: serializer.fromJson<String?>(json['googleEventId']),
+      isSynced: serializer.fromJson<bool>(json['isSynced']),
+      lastSyncedAt: serializer.fromJson<DateTime?>(json['lastSyncedAt']),
+      syncStatus: $EventsTable.$convertersyncStatusn.fromJson(
+        serializer.fromJson<String?>(json['syncStatus']),
+      ),
     );
   }
   @override
@@ -715,6 +848,12 @@ class Event extends DataClass implements Insertable<Event> {
       'color': serializer.toJson<int?>(color),
       'priority': serializer.toJson<int>(priority),
       'fkCategoryID': serializer.toJson<int?>(fkCategoryID),
+      'googleEventId': serializer.toJson<String?>(googleEventId),
+      'isSynced': serializer.toJson<bool>(isSynced),
+      'lastSyncedAt': serializer.toJson<DateTime?>(lastSyncedAt),
+      'syncStatus': serializer.toJson<String?>(
+        $EventsTable.$convertersyncStatusn.toJson(syncStatus),
+      ),
     };
   }
 
@@ -730,6 +869,10 @@ class Event extends DataClass implements Insertable<Event> {
     Value<int?> color = const Value.absent(),
     int? priority,
     Value<int?> fkCategoryID = const Value.absent(),
+    Value<String?> googleEventId = const Value.absent(),
+    bool? isSynced,
+    Value<DateTime?> lastSyncedAt = const Value.absent(),
+    Value<SyncStatus?> syncStatus = const Value.absent(),
   }) => Event(
     id: id ?? this.id,
     title: title ?? this.title,
@@ -742,6 +885,12 @@ class Event extends DataClass implements Insertable<Event> {
     color: color.present ? color.value : this.color,
     priority: priority ?? this.priority,
     fkCategoryID: fkCategoryID.present ? fkCategoryID.value : this.fkCategoryID,
+    googleEventId: googleEventId.present
+        ? googleEventId.value
+        : this.googleEventId,
+    isSynced: isSynced ?? this.isSynced,
+    lastSyncedAt: lastSyncedAt.present ? lastSyncedAt.value : this.lastSyncedAt,
+    syncStatus: syncStatus.present ? syncStatus.value : this.syncStatus,
   );
   Event copyWithCompanion(EventsCompanion data) {
     return Event(
@@ -762,6 +911,16 @@ class Event extends DataClass implements Insertable<Event> {
       fkCategoryID: data.fkCategoryID.present
           ? data.fkCategoryID.value
           : this.fkCategoryID,
+      googleEventId: data.googleEventId.present
+          ? data.googleEventId.value
+          : this.googleEventId,
+      isSynced: data.isSynced.present ? data.isSynced.value : this.isSynced,
+      lastSyncedAt: data.lastSyncedAt.present
+          ? data.lastSyncedAt.value
+          : this.lastSyncedAt,
+      syncStatus: data.syncStatus.present
+          ? data.syncStatus.value
+          : this.syncStatus,
     );
   }
 
@@ -778,7 +937,11 @@ class Event extends DataClass implements Insertable<Event> {
           ..write('isDone: $isDone, ')
           ..write('color: $color, ')
           ..write('priority: $priority, ')
-          ..write('fkCategoryID: $fkCategoryID')
+          ..write('fkCategoryID: $fkCategoryID, ')
+          ..write('googleEventId: $googleEventId, ')
+          ..write('isSynced: $isSynced, ')
+          ..write('lastSyncedAt: $lastSyncedAt, ')
+          ..write('syncStatus: $syncStatus')
           ..write(')'))
         .toString();
   }
@@ -796,6 +959,10 @@ class Event extends DataClass implements Insertable<Event> {
     color,
     priority,
     fkCategoryID,
+    googleEventId,
+    isSynced,
+    lastSyncedAt,
+    syncStatus,
   );
   @override
   bool operator ==(Object other) =>
@@ -811,7 +978,11 @@ class Event extends DataClass implements Insertable<Event> {
           other.isDone == this.isDone &&
           other.color == this.color &&
           other.priority == this.priority &&
-          other.fkCategoryID == this.fkCategoryID);
+          other.fkCategoryID == this.fkCategoryID &&
+          other.googleEventId == this.googleEventId &&
+          other.isSynced == this.isSynced &&
+          other.lastSyncedAt == this.lastSyncedAt &&
+          other.syncStatus == this.syncStatus);
 }
 
 class EventsCompanion extends UpdateCompanion<Event> {
@@ -826,6 +997,10 @@ class EventsCompanion extends UpdateCompanion<Event> {
   final Value<int?> color;
   final Value<int> priority;
   final Value<int?> fkCategoryID;
+  final Value<String?> googleEventId;
+  final Value<bool> isSynced;
+  final Value<DateTime?> lastSyncedAt;
+  final Value<SyncStatus?> syncStatus;
   const EventsCompanion({
     this.id = const Value.absent(),
     this.title = const Value.absent(),
@@ -838,6 +1013,10 @@ class EventsCompanion extends UpdateCompanion<Event> {
     this.color = const Value.absent(),
     this.priority = const Value.absent(),
     this.fkCategoryID = const Value.absent(),
+    this.googleEventId = const Value.absent(),
+    this.isSynced = const Value.absent(),
+    this.lastSyncedAt = const Value.absent(),
+    this.syncStatus = const Value.absent(),
   });
   EventsCompanion.insert({
     this.id = const Value.absent(),
@@ -851,6 +1030,10 @@ class EventsCompanion extends UpdateCompanion<Event> {
     this.color = const Value.absent(),
     this.priority = const Value.absent(),
     this.fkCategoryID = const Value.absent(),
+    this.googleEventId = const Value.absent(),
+    this.isSynced = const Value.absent(),
+    this.lastSyncedAt = const Value.absent(),
+    this.syncStatus = const Value.absent(),
   }) : title = Value(title),
        dateInit = Value(dateInit),
        dateFinish = Value(dateFinish);
@@ -866,6 +1049,10 @@ class EventsCompanion extends UpdateCompanion<Event> {
     Expression<int>? color,
     Expression<int>? priority,
     Expression<int>? fkCategoryID,
+    Expression<String>? googleEventId,
+    Expression<bool>? isSynced,
+    Expression<DateTime>? lastSyncedAt,
+    Expression<String>? syncStatus,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -879,6 +1066,10 @@ class EventsCompanion extends UpdateCompanion<Event> {
       if (color != null) 'color': color,
       if (priority != null) 'priority': priority,
       if (fkCategoryID != null) 'fk_category_i_d': fkCategoryID,
+      if (googleEventId != null) 'google_event_id': googleEventId,
+      if (isSynced != null) 'is_synced': isSynced,
+      if (lastSyncedAt != null) 'last_synced_at': lastSyncedAt,
+      if (syncStatus != null) 'sync_status': syncStatus,
     });
   }
 
@@ -894,6 +1085,10 @@ class EventsCompanion extends UpdateCompanion<Event> {
     Value<int?>? color,
     Value<int>? priority,
     Value<int?>? fkCategoryID,
+    Value<String?>? googleEventId,
+    Value<bool>? isSynced,
+    Value<DateTime?>? lastSyncedAt,
+    Value<SyncStatus?>? syncStatus,
   }) {
     return EventsCompanion(
       id: id ?? this.id,
@@ -907,6 +1102,10 @@ class EventsCompanion extends UpdateCompanion<Event> {
       color: color ?? this.color,
       priority: priority ?? this.priority,
       fkCategoryID: fkCategoryID ?? this.fkCategoryID,
+      googleEventId: googleEventId ?? this.googleEventId,
+      isSynced: isSynced ?? this.isSynced,
+      lastSyncedAt: lastSyncedAt ?? this.lastSyncedAt,
+      syncStatus: syncStatus ?? this.syncStatus,
     );
   }
 
@@ -946,6 +1145,20 @@ class EventsCompanion extends UpdateCompanion<Event> {
     if (fkCategoryID.present) {
       map['fk_category_i_d'] = Variable<int>(fkCategoryID.value);
     }
+    if (googleEventId.present) {
+      map['google_event_id'] = Variable<String>(googleEventId.value);
+    }
+    if (isSynced.present) {
+      map['is_synced'] = Variable<bool>(isSynced.value);
+    }
+    if (lastSyncedAt.present) {
+      map['last_synced_at'] = Variable<DateTime>(lastSyncedAt.value);
+    }
+    if (syncStatus.present) {
+      map['sync_status'] = Variable<String>(
+        $EventsTable.$convertersyncStatusn.toSql(syncStatus.value),
+      );
+    }
     return map;
   }
 
@@ -962,7 +1175,11 @@ class EventsCompanion extends UpdateCompanion<Event> {
           ..write('isDone: $isDone, ')
           ..write('color: $color, ')
           ..write('priority: $priority, ')
-          ..write('fkCategoryID: $fkCategoryID')
+          ..write('fkCategoryID: $fkCategoryID, ')
+          ..write('googleEventId: $googleEventId, ')
+          ..write('isSynced: $isSynced, ')
+          ..write('lastSyncedAt: $lastSyncedAt, ')
+          ..write('syncStatus: $syncStatus')
           ..write(')'))
         .toString();
   }
@@ -1568,6 +1785,10 @@ typedef $$EventsTableCreateCompanionBuilder =
       Value<int?> color,
       Value<int> priority,
       Value<int?> fkCategoryID,
+      Value<String?> googleEventId,
+      Value<bool> isSynced,
+      Value<DateTime?> lastSyncedAt,
+      Value<SyncStatus?> syncStatus,
     });
 typedef $$EventsTableUpdateCompanionBuilder =
     EventsCompanion Function({
@@ -1582,6 +1803,10 @@ typedef $$EventsTableUpdateCompanionBuilder =
       Value<int?> color,
       Value<int> priority,
       Value<int?> fkCategoryID,
+      Value<String?> googleEventId,
+      Value<bool> isSynced,
+      Value<DateTime?> lastSyncedAt,
+      Value<SyncStatus?> syncStatus,
     });
 
 final class $$EventsTableReferences
@@ -1694,6 +1919,27 @@ class $$EventsTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
+  ColumnFilters<String> get googleEventId => $composableBuilder(
+    column: $table.googleEventId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get isSynced => $composableBuilder(
+    column: $table.isSynced,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get lastSyncedAt => $composableBuilder(
+    column: $table.lastSyncedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<SyncStatus?, SyncStatus, String>
+  get syncStatus => $composableBuilder(
+    column: $table.syncStatus,
+    builder: (column) => ColumnWithTypeConverterFilters(column),
+  );
+
   $$CategoriesTableTableFilterComposer get fkCategoryID {
     final $$CategoriesTableTableFilterComposer composer = $composerBuilder(
       composer: this,
@@ -1802,6 +2048,26 @@ class $$EventsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get googleEventId => $composableBuilder(
+    column: $table.googleEventId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get isSynced => $composableBuilder(
+    column: $table.isSynced,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get lastSyncedAt => $composableBuilder(
+    column: $table.lastSyncedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get syncStatus => $composableBuilder(
+    column: $table.syncStatus,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   $$CategoriesTableTableOrderingComposer get fkCategoryID {
     final $$CategoriesTableTableOrderingComposer composer = $composerBuilder(
       composer: this,
@@ -1868,6 +2134,25 @@ class $$EventsTableAnnotationComposer
 
   GeneratedColumn<int> get priority =>
       $composableBuilder(column: $table.priority, builder: (column) => column);
+
+  GeneratedColumn<String> get googleEventId => $composableBuilder(
+    column: $table.googleEventId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get isSynced =>
+      $composableBuilder(column: $table.isSynced, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get lastSyncedAt => $composableBuilder(
+    column: $table.lastSyncedAt,
+    builder: (column) => column,
+  );
+
+  GeneratedColumnWithTypeConverter<SyncStatus?, String> get syncStatus =>
+      $composableBuilder(
+        column: $table.syncStatus,
+        builder: (column) => column,
+      );
 
   $$CategoriesTableTableAnnotationComposer get fkCategoryID {
     final $$CategoriesTableTableAnnotationComposer composer = $composerBuilder(
@@ -1961,6 +2246,10 @@ class $$EventsTableTableManager
                 Value<int?> color = const Value.absent(),
                 Value<int> priority = const Value.absent(),
                 Value<int?> fkCategoryID = const Value.absent(),
+                Value<String?> googleEventId = const Value.absent(),
+                Value<bool> isSynced = const Value.absent(),
+                Value<DateTime?> lastSyncedAt = const Value.absent(),
+                Value<SyncStatus?> syncStatus = const Value.absent(),
               }) => EventsCompanion(
                 id: id,
                 title: title,
@@ -1973,6 +2262,10 @@ class $$EventsTableTableManager
                 color: color,
                 priority: priority,
                 fkCategoryID: fkCategoryID,
+                googleEventId: googleEventId,
+                isSynced: isSynced,
+                lastSyncedAt: lastSyncedAt,
+                syncStatus: syncStatus,
               ),
           createCompanionCallback:
               ({
@@ -1987,6 +2280,10 @@ class $$EventsTableTableManager
                 Value<int?> color = const Value.absent(),
                 Value<int> priority = const Value.absent(),
                 Value<int?> fkCategoryID = const Value.absent(),
+                Value<String?> googleEventId = const Value.absent(),
+                Value<bool> isSynced = const Value.absent(),
+                Value<DateTime?> lastSyncedAt = const Value.absent(),
+                Value<SyncStatus?> syncStatus = const Value.absent(),
               }) => EventsCompanion.insert(
                 id: id,
                 title: title,
@@ -1999,6 +2296,10 @@ class $$EventsTableTableManager
                 color: color,
                 priority: priority,
                 fkCategoryID: fkCategoryID,
+                googleEventId: googleEventId,
+                isSynced: isSynced,
+                lastSyncedAt: lastSyncedAt,
+                syncStatus: syncStatus,
               ),
           withReferenceMapper: (p0) => p0
               .map(

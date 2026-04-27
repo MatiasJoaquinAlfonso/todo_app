@@ -1,5 +1,6 @@
 import 'package:drift/drift.dart';
 import 'package:todo_app/features/database/database.dart';
+import 'package:todo_app/features/database/tables/events.dart';
 import 'package:todo_app/features/todo/domain/entities/category_entity.dart';
 import 'package:todo_app/features/todo/domain/entities/event_entity.dart';
 
@@ -17,7 +18,11 @@ extension EventMapper on Event {
       color: color,
       priority: priority,
       isDone: isDone,
-      category: category
+      category: category,
+      googleEventId: googleEventId,
+      isSynced: isSynced,
+      lastSyncedAt: lastSyncedAt,
+      syncStatus: syncStatus?.name,
     );
   }
 }
@@ -36,6 +41,10 @@ extension EventEntityMapper on EventEntity {
       color: Value(color),
       priority: Value(priority),
       isDone: Value(isDone),
+      googleEventId: Value(googleEventId),
+      isSynced: Value(isSynced),
+      lastSyncedAt: Value(lastSyncedAt),
+      syncStatus: syncStatus != null ? Value(SyncStatus.values.firstWhere((e) => e.name == syncStatus)) : const Value.absent(),
     );
   }
 }

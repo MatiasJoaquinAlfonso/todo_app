@@ -15,6 +15,12 @@ class EventEntity extends Equatable {
   final int? color;
   final int priority;
   final CategoryEntity? category;
+  
+  // Google Calendar Sync
+  final String? googleEventId;
+  final bool isSynced;
+  final DateTime? lastSyncedAt;
+  final String? syncStatus;
 
   const EventEntity({ 
     this.id,
@@ -28,6 +34,10 @@ class EventEntity extends Equatable {
     this.color, 
     this.priority = 1,
     this.category,
+    this.googleEventId,
+    this.isSynced = false,
+    this.lastSyncedAt,
+    this.syncStatus,
   });
 
   EventEntity copyWith({
@@ -42,6 +52,10 @@ class EventEntity extends Equatable {
     int? color,
     int? priority,
     CategoryEntity? category,
+    String? googleEventId,
+    bool? isSynced,
+    DateTime? lastSyncedAt,
+    String? syncStatus,
   }) {
     return EventEntity(
       id: id ?? this.id,
@@ -55,9 +69,13 @@ class EventEntity extends Equatable {
       color: color ?? this.color,
       priority: priority ?? this.priority,
       category: category ?? this.category,
+      googleEventId: googleEventId ?? this.googleEventId,
+      isSynced: isSynced ?? this.isSynced,
+      lastSyncedAt: lastSyncedAt ?? this.lastSyncedAt,
+      syncStatus: syncStatus ?? this.syncStatus,
     );
   }
   
   @override
-  List<Object?> get props => [id, title, subTitle, description, dateInit, dateFinish, isAllDay, isDone, color, priority, category];
+  List<Object?> get props => [id, title, subTitle, description, dateInit, dateFinish, isAllDay, isDone, color, priority, category, googleEventId, isSynced, lastSyncedAt, syncStatus];
 }

@@ -105,6 +105,31 @@ class SettingsScreen extends StatelessWidget {
             ),
             const SizedBox(height: 24),
 
+            // Integrations
+            _SectionTitle(title: 'Integraciones', cs: cs),
+            const SizedBox(height: 12),
+            Container(
+              decoration: BoxDecoration(
+                color: isDark ? cs.surfaceContainerLow : cs.surfaceContainerHighest,
+                borderRadius: BorderRadius.circular(24),
+                border: Border.all(color: cs.outlineVariant.withAlpha(isDark ? 30 : 50)),
+              ),
+              child: _SettingItem(
+                icon: Icons.calendar_today_rounded,
+                title: 'Google Calendar',
+                trailing: CupertinoSwitch(
+                  value: false, // TODO: State management for this
+                  activeTrackColor: cs.primary,
+                  onChanged: (value) async {
+                    // TODO: call AuthService().signIn() or signOut()
+                  },
+                ),
+                isDark: isDark,
+                cs: cs,
+              ),
+            ),
+            const SizedBox(height: 24),
+
             // Notifications
             _SectionTitle(title: 'Notificaciones', cs: cs),
             const SizedBox(height: 12),
