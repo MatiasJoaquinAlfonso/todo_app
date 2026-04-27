@@ -57,5 +57,28 @@
 			<string>myCategory</string>
 		</dict>
 	</dict>
+
+	<!-- Google Sign-In Configuration -->
+	<!-- IMPORTANTE: Reemplazar con tu Client ID de la Google Cloud Console -->
+	<!-- Ir a: https://console.cloud.google.com → APIs & Services → Credentials -->
+	<!-- Crear un OAuth 2.0 Client ID de tipo "iOS application" -->
+	<!-- Bundle ID: com.to-do-App-JA -->
+	<key>GIDClientID</key>
+	<string>233513592231-bndc0345ifev4lnc5fmac22t08keg42d.apps.googleusercontent.com</string>
+
+	<!-- URL Scheme para el callback de Google Sign-In -->
+	<!-- Debe ser el Client ID invertido (reversed) -->
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<!-- Reemplazar con tu reversed Client ID -->
+				<string>com.googleusercontent.apps.233513592231-bndc0345ifev4lnc5fmac22t08keg42d</string>
+			</array>
+		</dict>
+	</array>
 </dict>
 </plist>

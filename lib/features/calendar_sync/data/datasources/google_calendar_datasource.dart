@@ -1,6 +1,6 @@
 import 'package:googleapis/calendar/v3.dart' as calendar;
-import 'package:google_sign_in/google_sign_in.dart';
 import 'package:http/http.dart' as http;
+import 'package:todo_app/features/calendar_sync/data/datasources/auth_service.dart';
 import 'package:todo_app/features/todo/domain/entities/event_entity.dart';
 
 /// Cliente HTTP personalizado que añade headers de autenticación
@@ -15,29 +15,26 @@ class GoogleHttpClient extends http.BaseClient {
     request.headers.addAll(_headers);
     return _client.send(request);
   }
-
 }
 
-/// Datasource para interactuar con Google Calendar API
+/// Datasource para interactuar con Google Calendar API.
+/// Usa AuthService para obtener los headers de auth, así ambos
+/// comparten la misma sesión de GoogleSignIn (no hay dos instancias separadas).
 class GoogleCalendarDatasource {
-  final GoogleSignIn _googleSignIn;
+  final AuthService _authService;
 
-  GoogleCalendarDatasource({GoogleSignIn? googleSignIn})
-      : _googleSignIn = googleSignIn ?? GoogleSignIn(
-          scopes: [
-            'https://www.googleapis.com/auth/calendar.events',
-          ],
-        );
+  GoogleCalendarDatasource({AuthService? authService})
+      : _authService = authService ?? AuthService();
 
-  /// Obtiene el cliente de la API de Calendar autenticado
+  /// Obtiene el cliente de la API de Calendar autenticado usando AuthService
   Future<calendar.CalendarApi> _getCalendarApi() async {
-    final user = _googleSignIn.currentUser;
-    if (user == null) {
-      throw Exception('Usuario no autenticado');
+    final headers = await _authService.authHeaders;
+    if (headers == null) {
+      throw Exception(
+        'Usuario no autenticado. Conectá tu cuenta de Google en Ajustes.',
+      );
     }
-
-    final authHeaders = await user.authHeaders;
-    final client = GoogleHttpClient(authHeaders);
+    final client = GoogleHttpClient(headers);
     return calendar.CalendarApi(client);
   }
 

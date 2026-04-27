@@ -1,5 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:todo_app/features/calendar_sync/presentation/cubit/calendar_sync_cubit.dart';
 import 'package:todo_app/features/shared/services/notification_service.dart';
 import 'package:todo_app/features/todo/domain/entities/event_entity.dart';
 import 'package:todo_app/features/todo/domain/entities/notification_entity.dart';
@@ -22,6 +23,7 @@ class TodoBloc extends Bloc<TodoEvent, TodoState> {
   final AddEventNotificationUseCase _addNotification;
   final GetEventNotificationsUseCase _getNotifications;
   final DeleteEventNotificationsUseCase _deleteNotifications;
+  final CalendarSyncCubit? _calendarSyncCubit;
 
   TodoBloc({
     required GetEventsUseCase getEvents,
@@ -31,6 +33,7 @@ class TodoBloc extends Bloc<TodoEvent, TodoState> {
     required AddEventNotificationUseCase addNotification,
     required GetEventNotificationsUseCase getNotifications,
     required DeleteEventNotificationsUseCase deleteNotifications,
+    CalendarSyncCubit? calendarSyncCubit,
   }) : _getEvents = getEvents,
        _createEvent = createEvent,
        _updateEvent = updateEvent,
@@ -38,6 +41,7 @@ class TodoBloc extends Bloc<TodoEvent, TodoState> {
        _addNotification = addNotification,
        _getNotifications = getNotifications,
        _deleteNotifications = deleteNotifications,
+       _calendarSyncCubit = calendarSyncCubit,
        super(TodoInitial()) {
 
     on<TodoSubscriptionRequested>(_onSubscriptionRequested);
@@ -66,6 +70,23 @@ class TodoBloc extends Bloc<TodoEvent, TodoState> {
     try {
       final int taskId = await _createEvent(event.event);
       await _scheduleNotifications(taskId, event.event);
+
+      // Sincronizar con Google Calendar si está habilitado
+      final syncCubit = _calendarSyncCubit;
+      if (event.event.isSynced && syncCubit != null && syncCubit.state.isConnected) {
+        final googleEventId = await syncCubit.syncEvent(event.event);
+        if (googleEventId != null) {
+          // Actualizar el evento local con el ID de Google
+          final syncedEvent = event.event.copyWith(
+            id: taskId,
+            googleEventId: googleEventId,
+            isSynced: true,
+            lastSyncedAt: DateTime.now(),
+            syncStatus: 'synced',
+          );
+          await _updateEvent(syncedEvent);
+        }
+      }
     } catch (e) {
       emit(TodoError("Error al guardar tarea: $e"));
     }
@@ -77,6 +98,16 @@ class TodoBloc extends Bloc<TodoEvent, TodoState> {
   ) async {
     try {
       if (event.event.id == null) return;
+
+      // Eliminar de Google Calendar si estaba sincronizado
+      final syncCubit = _calendarSyncCubit;
+      if (event.event.googleEventId != null && 
+          event.event.googleEventId!.isNotEmpty &&
+          syncCubit != null &&
+          syncCubit.state.isConnected) {
+        await syncCubit.deleteGoogleEvent(event.event.googleEventId!);
+      }
+
       await _deleteSecheduleNotification(event.event.id!);
       await _deleteEvent(event.event);
     } catch (e) {
@@ -92,7 +123,24 @@ class TodoBloc extends Bloc<TodoEvent, TodoState> {
       if (event.event.id == null) return;
 
       await _deleteSecheduleNotification(event.event.id!);
-      await _updateEvent(event.event);
+
+      // Sincronizar con Google Calendar si está habilitado
+      final syncCubit = _calendarSyncCubit;
+      if (event.event.isSynced && syncCubit != null && syncCubit.state.isConnected) {
+        final googleEventId = await syncCubit.syncEvent(event.event);
+        if (googleEventId != null) {
+          final syncedEvent = event.event.copyWith(
+            googleEventId: googleEventId,
+            lastSyncedAt: DateTime.now(),
+            syncStatus: 'synced',
+          );
+          await _updateEvent(syncedEvent);
+        } else {
+          await _updateEvent(event.event);
+        }
+      } else {
+        await _updateEvent(event.event);
+      }
 
       if (!event.event.isDone){
         await _scheduleNotifications(event.event.id!, event.event);

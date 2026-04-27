@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:todo_app/features/calendar_sync/presentation/cubit/calendar_sync_cubit.dart';
 import 'package:todo_app/features/screens/categories_screen.dart';
 import 'package:todo_app/features/screens/screens.dart';
 import 'package:todo_app/features/shared/widgets/widgets.dart';
@@ -29,6 +30,14 @@ import 'package:todo_app/features/todo/domain/use_cases/event/remove_category_fr
 
 TodoBloc _createTodoBloc(BuildContext context) {
   final repo = context.read<EventRepository>();
+  // Accedemos al CalendarSyncCubit global para inyectarlo al TodoBloc
+  CalendarSyncCubit? calendarCubit;
+  try {
+    calendarCubit = context.read<CalendarSyncCubit>();
+  } catch (_) {
+    // Si no está disponible, el sync simplemente no se ejecuta
+  }
+
   return TodoBloc(
     getEvents: GetEventsUseCase(repo),
     createEvent: CreateEventUseCase(repo),
@@ -37,6 +46,7 @@ TodoBloc _createTodoBloc(BuildContext context) {
     addNotification: AddEventNotificationUseCase(repo),
     getNotifications: GetEventNotificationsUseCase(repo),
     deleteNotifications: DeleteEventNotificationsUseCase(repo),
+    calendarSyncCubit: calendarCubit,
   );
 }
 

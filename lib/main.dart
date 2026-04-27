@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:todo_app/config/router/app_router.dart';
 import 'package:todo_app/config/theme/app_theme.dart';
+import 'package:todo_app/features/calendar_sync/data/repositories/calendar_sync_repository_impl.dart';
+import 'package:todo_app/features/calendar_sync/domain/repositories/calendar_sync_repository.dart';
+import 'package:todo_app/features/calendar_sync/presentation/cubit/calendar_sync_cubit.dart';
 import 'package:todo_app/features/database/database.dart';
 import 'package:todo_app/features/shared/services/preferences_service.dart';
 import 'package:todo_app/features/todo/data/repositories/category_repository_impl.dart';
@@ -41,10 +44,21 @@ class MyApp extends StatelessWidget {
         RepositoryProvider<CategoryRepository>(
           create: (context) => CategoryRepositoryImpl(db: db),
         ),
+
+        RepositoryProvider<CalendarSyncRepository>(
+          create: (context) => CalendarSyncRepositoryImpl.create(),
+        ),
       ],
 
-      child: BlocProvider(
-        create: (context) => ThemeCubit(),
+      child: MultiBlocProvider(
+        providers: [
+          BlocProvider(create: (context) => ThemeCubit()),
+          BlocProvider(
+            create: (context) => CalendarSyncCubit(
+              repository: context.read<CalendarSyncRepository>(),
+            )..init(),
+          ),
+        ],
         child: BlocBuilder<ThemeCubit, ThemeState>(
           builder: (context, state) {
             return MaterialApp.router(

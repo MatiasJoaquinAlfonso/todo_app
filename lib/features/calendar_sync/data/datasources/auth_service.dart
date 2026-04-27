@@ -10,11 +10,12 @@ class AuthService {
   );
 
   /// Inicia sesión con Google
-  /// Retorna true si el login fue exitoso
+  /// Retorna true SOLO si el login fue exitoso y se obtuvo un usuario real
   Future<bool> signIn() async {
     try {
-      await _googleSignIn.signIn();
-      return true;
+      final account = await _googleSignIn.signIn();
+      // account es null si el usuario canceló o si hubo un error OAuth
+      return account != null;
     } catch (e) {
       return false;
     }
@@ -56,10 +57,11 @@ class AuthService {
 
   /// Dispara el flujo de autenticación silenciosamente
   /// Útil para verificar si ya hay una sesión activa
+  /// Retorna true SOLO si se recuperó un usuario real (no null)
   Future<bool> trySilentSignIn() async {
     try {
-      await _googleSignIn.signInSilently();
-      return true;
+      final account = await _googleSignIn.signInSilently();
+      return account != null;
     } catch (e) {
       return false;
     }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:todo_app/features/calendar_sync/presentation/cubit/calendar_sync_cubit.dart';
 import 'package:todo_app/features/todo/domain/entities/category_entity.dart';
 import 'package:todo_app/features/todo/domain/entities/event_entity.dart';
 import 'package:todo_app/features/todo/presentation/bloc/categories_bloc/bloc/category_bloc.dart';
@@ -44,6 +45,7 @@ class _TaskScreenState extends State<TaskScreen> {
       _timeInit = TimeOfDay.fromDateTime(widget.event!.dateInit);
       _timeFinish = TimeOfDay.fromDateTime(widget.event!.dateFinish);
       _selectedCategory = widget.event?.category;
+      _syncWithGoogle = widget.event!.isSynced;
     }
   }
 
@@ -377,53 +379,68 @@ class _TaskScreenState extends State<TaskScreen> {
                     ),
                     const SizedBox(height: 16),
 
-                    // Google Sync
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                      decoration: BoxDecoration(
-                        color: cs.surfaceContainerLow,
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      child: Row(
-                        children: [
-                          Icon(Icons.calendar_today_rounded, size: 20, color: cs.primary),
-                          const SizedBox(width: 16),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'GOOGLE CALENDAR',
-                                  style: GoogleFonts.manrope(
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.w700,
-                                    color: cs.onSurfaceVariant,
-                                    letterSpacing: 0.5,
-                                  ),
-                                ),
-                                const SizedBox(height: 2),
-                                Text(
-                                  'Sincronizar evento',
-                                  style: GoogleFonts.inter(
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.w600,
-                                    color: cs.primary,
-                                  ),
-                                ),
-                              ],
-                            ),
+                    // Google Calendar Sync
+                    BlocBuilder<CalendarSyncCubit, CalendarSyncState>(
+                      builder: (context, calendarState) {
+                        final isGoogleConnected = calendarState.isConnected;
+                        return Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                          decoration: BoxDecoration(
+                            color: cs.surfaceContainerLow,
+                            borderRadius: BorderRadius.circular(16),
                           ),
-                          Switch(
-                            value: _syncWithGoogle,
-                            activeColor: cs.primary,
-                            onChanged: (value) {
-                              setState(() {
-                                _syncWithGoogle = value;
-                              });
-                            },
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.calendar_today_rounded,
+                                size: 20,
+                                color: isGoogleConnected ? cs.primary : cs.onSurfaceVariant,
+                              ),
+                              const SizedBox(width: 16),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'GOOGLE CALENDAR',
+                                      style: GoogleFonts.manrope(
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.w700,
+                                        color: cs.onSurfaceVariant,
+                                        letterSpacing: 0.5,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 2),
+                                    Text(
+                                      isGoogleConnected
+                                          ? 'Sincronizar evento'
+                                          : 'Conectá tu cuenta en Ajustes',
+                                      style: GoogleFonts.inter(
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.w600,
+                                        color: isGoogleConnected
+                                            ? cs.primary
+                                            : cs.onSurfaceVariant,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Switch(
+                                value: _syncWithGoogle,
+                                activeThumbColor: cs.primary,
+                                onChanged: isGoogleConnected
+                                    ? (value) {
+                                        setState(() {
+                                          _syncWithGoogle = value;
+                                        });
+                                      }
+                                    : null,
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
+                        );
+                      },
                     ),
                     const SizedBox(height: 32),
 
